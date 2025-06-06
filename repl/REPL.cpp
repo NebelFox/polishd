@@ -7,7 +7,7 @@ REPL::REPL(polishd::Grammar grammar) : m_compiler(grammar), m_argsPattern("(?:([
     m_commands["eval"] = [&](){ eval();};
     m_commands["evals"] = [&](){ evalSaved();};
     m_commands["show"] = [&](){show();};
-    m_commands["list-saved"] = [&](){listSaved();};
+    m_commands["list"] = [&](){listSaved();};
     m_commands["delete"] = [&](){deleteSaved();};
     m_commands["clear"] = [&](){clear();};
     m_commands["grammar"] = [&](){showGrammar();};
@@ -156,7 +156,7 @@ void REPL::help()
             "# > evals name args...      - eval saved function 'name'        #\n"
             "#=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#\n"
             "# > show name   - 'name' function in infix & postfix notations  #\n"
-            "# > list-saved  - all saved functions                           #\n"
+            "# > list        - all saved functions                           #\n"
             "# > delete name - delete the 'name' function                    #\n"
             "# > clear       - delete all functions                          #\n"
             "#=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#\n"
