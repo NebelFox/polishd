@@ -1,7 +1,7 @@
-#include "Calculator.hpp"
+#include "REPL.hpp"
 
 int main()
 {
-    Calculator().dialogue();
+    REPL().start();
     return 0;
 }

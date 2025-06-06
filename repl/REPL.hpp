@@ -22,12 +22,12 @@ using std::smatch;
 using std::regex_match;
 
 
-class Calculator
+class REPL
 {
 public:
-    Calculator();
+    REPL();
 
-    void dialogue();
+    void start();
 
     void eval();
     void save();
@@ -41,7 +41,7 @@ public:
     static void argsInfo();
     static void help();
 
-    ~Calculator();
+    ~REPL();
 
 private:
     Grammar m_grammar;

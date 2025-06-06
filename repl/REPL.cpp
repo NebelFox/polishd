@@ -1,10 +1,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include "Calculator.hpp"
+#include "REPL.hpp"
 
 
-void Calculator::setupGrammar(Grammar& grammar)
+void REPL::setupGrammar(Grammar& grammar)
 {
     grammar.addConstant("pi", M_PI);
     grammar.addConstant("e", M_E);
@@ -58,7 +58,7 @@ void Calculator::setupGrammar(Grammar& grammar)
 }
 
 
-Calculator::Calculator() : m_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)")
+REPL::REPL() : m_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)")
 {
     setupGrammar(m_grammar);
     m_compiler = new Compiler(m_grammar);
@@ -75,7 +75,7 @@ Calculator::Calculator() : m_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)")
 
 }
 
-void Calculator::dialogue()
+void REPL::start()
 {
     bool running = true;
     std::string keyword;
@@ -96,7 +96,7 @@ void Calculator::dialogue()
     }
 }
 
-void Calculator::save()
+void REPL::save()
 {
     std::string name;
     std::cin >> name >> std::ws;
@@ -106,7 +106,7 @@ void Calculator::save()
     m_functions.insert_or_assign(name, m_compiler->compile(expression));
 }
 
-void Calculator::eval()
+void REPL::eval()
 {
     std::string tail;
     std::getline(std::cin >> std::ws, tail);
@@ -129,7 +129,7 @@ void Calculator::eval()
     std::cout << "The result = " << result << std::endl;
 }
 
-void Calculator::evalSaved()
+void REPL::evalSaved()
 {
     std::string name;
     std::cin >> name >> std::ws;
@@ -149,7 +149,7 @@ void Calculator::evalSaved()
         std::cout << "Unknown function: '" << name << "'\n";
 }
 
-void Calculator::show()
+void REPL::show()
 {
     std::string name;
     std::cin >> name;
@@ -164,7 +164,7 @@ void Calculator::show()
     }
 }
 
-void Calculator::listSaved()
+void REPL::listSaved()
 {
     if (m_functions.empty())
     {
@@ -177,19 +177,19 @@ void Calculator::listSaved()
     }
 }
 
-void Calculator::deleteSaved()
+void REPL::deleteSaved()
 {
     std::string name;
     std::cin >> name;
     m_functions.erase(name);
 }
 
-void Calculator::clear()
+void REPL::clear()
 {
     m_functions.clear();
 }
 
-void Calculator::grammar()
+void REPL::grammar()
 {
     std::cout << "Constants: ";
     for (const auto& pair: m_grammar.constants())
@@ -206,7 +206,7 @@ void Calculator::grammar()
     std::cout << endl;
 }
 
-void Calculator::argsInfo()
+void REPL::argsInfo()
 {
     static const std::string message(
             "#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#\n"
@@ -222,7 +222,7 @@ void Calculator::argsInfo()
     std::cout << message;
 }
 
-void Calculator::help()
+void REPL::help()
 {
     static const std::string message(
             "#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#\n"
@@ -246,7 +246,7 @@ void Calculator::help()
     std::cout << message;
 }
 
-Calculator::~Calculator()
+REPL::~REPL()
 {
     delete m_compiler;
 }

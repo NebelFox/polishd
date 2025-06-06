@@ -1,4 +1,4 @@
-add_executable(repl main.cpp Calculator.cpp)
+add_executable(repl main.cpp REPL.cpp)
 
 target_link_libraries(repl PRIVATE polishd)
 
