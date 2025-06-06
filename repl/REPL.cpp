@@ -25,7 +25,7 @@ void REPL::start()
     std::cout << std::endl;
     while (running)
     {
-        std::cout << "$~";
+        std::cout << "$ ";
         std::cin >> keyword;
         auto lookup = m_commands.find(keyword);
         if(lookup != m_commands.end())
@@ -68,7 +68,7 @@ void REPL::eval()
 //        cout << "Expression: [" << expression << "]\n";
     polishd::Function f = m_compiler->compile(expression);
     double result = f(args);
-    std::cout << "The result = " << result << std::endl;
+    std::cout << result << std::endl;
 }
 
 void REPL::evalSaved()
@@ -86,9 +86,9 @@ void REPL::evalSaved()
         args.insert_or_assign((*iterator)[1].str(), std::stod((*iterator)[2].str()));
     auto lookup = m_functions.find(name);
     if (lookup != m_functions.end())
-        std::cout << "The result is: " << lookup->second(args) << std::endl;
+        std::cout << lookup->second(args) << std::endl;
     else
-        std::cout << "Unknown function: '" << name << "'\n";
+        std::cout << "Unknown function: '" << name << '\'' << std::endl;
 }
 
 void REPL::show()
@@ -98,11 +98,8 @@ void REPL::show()
     auto lookup = m_functions.find(name);
     if (lookup != m_functions.end())
     {
-        std::cout << "Infix form: "
-                  << lookup->second.infix()
-                  << "\nPostfix form: "
-                  << lookup->second.postfix()
-                  << std::endl;
+        std::cout << "Infix form: " << lookup->second.infix() << std::endl
+                  << "Postfix form: " << lookup->second.postfix() << std::endl;
     }
 }
 
@@ -110,7 +107,7 @@ void REPL::listSaved()
 {
     if (m_functions.empty())
     {
-        std::cout << "No functions\n";
+        std::cout << "No functions" << std::endl;
     }
     else
     {
@@ -136,13 +133,13 @@ void REPL::showGrammar()
     std::cout << "Constants: ";
     for (const auto& pair: m_grammar.constants())
         std::cout << pair.first << '=' << pair.second << ", ";
-    std::cout << "\nPrefix Functions: ";
+    std::cout << std::endl << "Prefix Functions: ";
     for (const auto& pair: m_grammar.prefix())
         std::cout << pair.first << ", ";
-    std::cout << "\nBinary Operations (precedence): ";
+    std::cout << std::endl << "Binary Operations (precedence): ";
     for (const auto& pair: m_grammar.binary())
         std::cout << pair.first << '(' << (short) pair.second.precedence << "), ";
-    std::cout << "\nPostfix Functions: ";
+    std::cout << std::endl << "Postfix Functions: ";
     for (const auto& pair: m_grammar.postfix())
         std::cout << pair.first << ", ";
     std::cout << std::endl;
