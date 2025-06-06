@@ -13,7 +13,7 @@
 class REPL
 {
 public:
-    REPL(polishd::Grammar grammar);
+    REPL(polishd::Grammar& grammar);
 
     void start();
 

@@ -3,7 +3,7 @@
 
 const std::regex REPL::s_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)");
 
-REPL::REPL(polishd::Grammar grammar) : m_compiler(grammar)
+REPL::REPL(polishd::Grammar& grammar) : m_compiler(grammar)
 {
     m_commands["save"] = [&](){save();};
     m_commands["eval"] = [&](){ eval();};
