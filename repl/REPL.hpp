@@ -10,18 +10,6 @@
 #include "Function.hpp"
 
 
-using std::map;
-using std::string;
-using std::cin;
-using std::cout;
-using std::endl;
-
-using std::regex;
-using std::sregex_iterator;
-using std::smatch;
-using std::regex_match;
-
-
 class REPL
 {
 public:
@@ -46,9 +34,9 @@ public:
 private:
     Grammar m_grammar;
     Compiler* m_compiler;
-    map<string, Function> m_functions;
-    map<string, std::function<void()>> m_commands;
-    const regex m_argsPattern;
+    std::map<std::string, Function> m_functions;
+    std::map<std::string, std::function<void()>> m_commands;
+    const std::regex m_argsPattern;
 private:
     static void setupGrammar(Grammar& grammar);
 };

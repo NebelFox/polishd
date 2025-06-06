@@ -28,7 +28,7 @@ private:
 
     Unit CompileBinary(const Token& token);
 
-    static string stringify(const std::list<Token>& tokens);
+    static std::string stringify(const std::list<Token>& tokens);
 
 private:
     Grammar m_grammar;

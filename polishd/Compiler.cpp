@@ -49,7 +49,7 @@ Function Compiler::compile(const std::string& infix)
         }
         else if ((TT_BINARY & next) && (length = m_grammar.matchBinary(infix, i)))
         {
-            string signature = infix.substr(i, length);
+            std::string signature = infix.substr(i, length);
             Grammar::Precedence p = m_grammar.precedenceOf(signature);
             while (!stack.empty()
                 && (stack.top().type == TT_PREFIX || m_grammar.precedenceOf(stack.top().value) > p))
@@ -150,20 +150,20 @@ std::list<Unit> Compiler::compile(const std::list<Token>& tokens)
 Unit Compiler::CompileNumber(const Token& token)
 {
     double x = stod(token.value);
-    return [x](Stack stack, Args args) -> double
+    return [x](Stack stack, Function::Args args) -> double
     { return x; };
 }
 
 Unit Compiler::CompileArgument(const Token& token)
 {
-    return [name=token.value](Stack stack, Args args) -> double
+    return [name=token.value](Stack stack, Function::Args args) -> double
     { return args.at(name); };
 }
 
-Unit Compiler::CompileUnary(const Token& token, const std::map<string, Grammar::Unary>& registry)
+Unit Compiler::CompileUnary(const Token& token, const std::map<std::string, Grammar::Unary>& registry)
 {
     const Grammar::Unary& unary = registry.at(token.value);
-    return [unary](Stack stack, Args args) -> double
+    return [unary](Stack stack, Function::Args args) -> double
     {
         double x = stack.top();
         stack.pop();
@@ -184,7 +184,7 @@ Unit Compiler::CompilePostfix(const Token& token)
 Unit Compiler::CompileBinary(const Token& token)
 {
     const Grammar::Binary& binary = m_grammar.binary().at(token.value).binary;
-    return [binary](Stack stack, Args args) -> double
+    return [binary](Stack stack, Function::Args args) -> double
     {
         double b = stack.top();
         stack.pop();

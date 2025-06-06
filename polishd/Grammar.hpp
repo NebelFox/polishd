@@ -4,9 +4,6 @@
 #include <string>
 #include <map>
 
-using std::string;
-using std::map;
-
 class Grammar
 {
 public:
@@ -22,38 +19,38 @@ public:
     };
 
 public:
-    [[nodiscard]] const map<string, double>& constants() const;
-    [[nodiscard]] const map<string, Unary>& prefix() const;
-    [[nodiscard]] const map<string, BinaryOperator>& binary() const;
-    [[nodiscard]] const map<string, Unary>& postfix() const;
+    [[nodiscard]] const std::map<std::string, double>& constants() const;
+    [[nodiscard]] const std::map<std::string, Unary>& prefix() const;
+    [[nodiscard]] const std::map<std::string, BinaryOperator>& binary() const;
+    [[nodiscard]] const std::map<std::string, Unary>& postfix() const;
 
-    static size_t matchNumber(const string& s, const size_t start);
-    static size_t matchArgument(const string& s, const size_t start);
+    static size_t matchNumber(const std::string& s, const size_t start);
+    static size_t matchArgument(const std::string& s, const size_t start);
 
-    size_t matchPrefix(const string& s, const size_t start) const;
-    size_t matchBinary(const string& s, const size_t start) const;
-    size_t matchPostfix(const string& s, const size_t start) const;
+    size_t matchPrefix(const std::string& s, const size_t start) const;
+    size_t matchBinary(const std::string& s, const size_t start) const;
+    size_t matchPostfix(const std::string& s, const size_t start) const;
 
-    Precedence precedenceOf(const string& signature) const;
+    Precedence precedenceOf(const std::string& signature) const;
 
-    void addConstant(const string& name, const double value);
-    void addPrefixOperator(const string& signature, Unary prefix);
-    void addBinaryOperator(const string& signature, Binary binary, const Precedence precedence);
-    void addPostfixOperator(const string& signature, Unary postfix);
+    void addConstant(const std::string& name, const double value);
+    void addPrefixOperator(const std::string& signature, Unary prefix);
+    void addBinaryOperator(const std::string& signature, Binary binary, const Precedence precedence);
+    void addPostfixOperator(const std::string& signature, Unary postfix);
 
 private:
-    map<string, double> m_constants;
-    map<string, Unary> m_prefixOperators;
-    map<string, BinaryOperator> m_binaryOperators;
-    map<string, Unary> m_postfixOperators;
+    std::map<std::string, double> m_constants;
+    std::map<std::string, Unary> m_prefixOperators;
+    std::map<std::string, BinaryOperator> m_binaryOperators;
+    std::map<std::string, Unary> m_postfixOperators;
 private:
     template<typename Operator>
-    static size_t match(const string& s, const size_t start, const map<string, Operator>& ops);
+    static size_t match(const std::string& s, const size_t start, const std::map<std::string, Operator>& ops);
 };
 
 
 template<typename Operator>
-size_t Grammar::match(const string& s, const size_t start, const map<string, Operator>& ops)
+size_t Grammar::match(const std::string& s, const size_t start, const std::map<std::string, Operator>& ops)
 {
     size_t length;
     for (const auto& pair: ops)

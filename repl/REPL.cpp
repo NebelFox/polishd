@@ -91,8 +91,8 @@ void REPL::start()
         else if(keyword == "exit")
             running = false;
         else
-            std::cout << "Unknown command" << endl;
-        std::cout << endl;
+            std::cout << "Unknown command" << std::endl;
+        std::cout << std::endl;
     }
 }
 
@@ -101,7 +101,7 @@ void REPL::save()
     std::string name;
     std::cin >> name >> std::ws;
     std::string expression;
-    std::getline(cin, expression);
+    std::getline(std::cin, expression);
 //        cout << "save | name=[" << name << "] expression=[" << expression << "]\n";
     m_functions.insert_or_assign(name, m_compiler->compile(expression));
 }
@@ -203,7 +203,7 @@ void REPL::grammar()
     std::cout << "\nPostfix Functions: ";
     for (const auto& pair: m_grammar.postfix())
         std::cout << pair.first << ", ";
-    std::cout << endl;
+    std::cout << std::endl;
 }
 
 void REPL::argsInfo()
