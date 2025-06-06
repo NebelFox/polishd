@@ -102,7 +102,8 @@ Function Compiler::compile(const std::string& infix)
             throw std::logic_error(s.str());
         }
         i += length;
-        while (infix[i] == ' ') ++i;
+        while (infix[i] == ' ')
+            ++i;
     }
     while (!stack.empty())
     {
@@ -114,7 +115,6 @@ Function Compiler::compile(const std::string& infix)
                     infix,
                     stringify(expression));
 }
-
 
 std::list<Unit> Compiler::compile(const std::list<Token>& tokens)
 {
@@ -186,11 +186,11 @@ Unit Compiler::CompileBinary(const Token& token)
     const Grammar::Binary& binary = m_grammar.binary().at(token.value).binary;
     return [binary](Stack stack, Args args) -> double
     {
-        double a = stack.top();
-        stack.pop();
         double b = stack.top();
         stack.pop();
-        return binary(b, a);
+        double a = stack.top();
+        stack.pop();
+        return binary(a, b);
     };
 }
 

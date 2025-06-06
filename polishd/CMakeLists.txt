@@ -9,4 +9,3 @@ target_include_directories(polishd PUBLIC
 )
 
 target_compile_options(polishd PRIVATE -Wall -Wextra -Wpedantic)
-
