@@ -32,7 +32,7 @@ private:
     polishd::Compiler m_compiler;
     std::map<std::string, polishd::Function> m_functions;
     std::map<std::string, std::function<void()>> m_commands;
-    const std::regex m_argsPattern;
+    static const std::regex s_argsPattern;
 };
 
 

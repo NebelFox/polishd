@@ -1,7 +1,9 @@
 #include "REPL.hpp"
 
 
-REPL::REPL(polishd::Grammar grammar) : m_compiler(grammar), m_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)")
+const std::regex REPL::s_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)");
+
+REPL::REPL(polishd::Grammar grammar) : m_compiler(grammar)
 {
     m_commands["save"] = [&](){save();};
     m_commands["eval"] = [&](){ eval();};
@@ -58,7 +60,7 @@ void REPL::eval()
     std::getline(std::cin >> std::ws, tail);
     auto iterator = std::sregex_iterator(tail.begin(),
                                          tail.end(),
-                                         m_argsPattern);
+                                         s_argsPattern);
     auto end = std::sregex_iterator();
     size_t argsBegin = std::string::npos;
     if(iterator != end)
@@ -83,7 +85,7 @@ void REPL::evalSaved()
     std::getline(std::cin, tail);
     auto iterator = std::sregex_iterator(tail.begin(),
                                          tail.end(),
-                                         m_argsPattern);
+                                         s_argsPattern);
     auto end = std::sregex_iterator();
     for (; iterator != end; ++iterator)
         args.insert_or_assign((*iterator)[1].str(), std::stod((*iterator)[2].str()));
