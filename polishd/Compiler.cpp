@@ -18,7 +18,7 @@ namespace polishd {
 
     Function Compiler::compile(const std::string& infix)
     {
-        bool expectOperand = false;
+        bool expectOperand = true;
         std::list<Token> expression;
         std::stack<Token> stack;
 
@@ -34,7 +34,6 @@ namespace polishd {
                             .type = TokenType::Number,
                             .value = infix.substr(i, length)
                     });
-                    // next = operators;
                     expectOperand = false;
                 }
                 else if((length = m_grammar.matchPrefix(infix, i)))
@@ -60,7 +59,8 @@ namespace polishd {
                 {
                     throw std::logic_error("Expected a number, an argument, a prefix function or an opening parenthesis");
                 }
-            } else
+            }
+            else
             {
                 if((length = m_grammar.matchBinary(infix, i)))
                 {
