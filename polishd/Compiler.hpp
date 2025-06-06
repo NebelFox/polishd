@@ -19,14 +19,11 @@ namespace polishd {
 
         static Unit CompileNumber(const Token& token);
 
-        static Unit CompileArgument(const Token& token);
-
         static Unit CompileUnary(const Token& token, const std::map<std::string, Grammar::Unary>& registry);
 
+        Unit CompileArgument(const Token& token);
         Unit CompilePrefix(const Token& token);
-
         Unit CompilePostfix(const Token& token);
-
         Unit CompileBinary(const Token& token);
 
         static std::string stringify(const std::list<Token>& tokens);

@@ -157,6 +157,11 @@ namespace polishd {
 
     Unit Compiler::CompileArgument(const Token& token)
     {
+        auto lookup = m_grammar.constants().find(token.value);
+        if(lookup != m_grammar.constants().end()) {
+            return [value=lookup->second](Stack stack, Function::Args args) -> double
+            { return value; };
+        }
         return [name=token.value](Stack stack, Function::Args args) -> double
         { return args.at(name); };
     }
