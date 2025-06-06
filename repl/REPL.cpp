@@ -1,66 +1,8 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #include "REPL.hpp"
 
 
-void REPL::setupGrammar(polishd::Grammar& grammar)
+REPL::REPL(polishd::Grammar grammar) : m_grammar(grammar), m_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)")
 {
-    grammar.addConstant("pi", M_PI);
-    grammar.addConstant("e", M_E);
-
-    grammar.addPrefixOperator("-",
-                                [](const double x) -> double
-                                { return -x; });
-    grammar.addPrefixOperator("exp",
-                                [](const double x) -> double
-                                { return std::exp(x); });
-    grammar.addPrefixOperator("sin",
-                                [](const double x) -> double
-                                { return std::sin(x); });
-    grammar.addPrefixOperator("cos",
-                                [](const double x) -> double
-                                { return std::cos(x); });
-    grammar.addPrefixOperator("floor",
-                                [](const double x) -> double
-                                { return std::floor(x); });
-    grammar.addPrefixOperator("ceil",
-                                [](const double x) -> double
-                                { return std::ceil(x); });
-    grammar.addPrefixOperator("round",
-                                [](const double x) -> double
-                                { return std::round(x); });
-
-    grammar.addBinaryOperator("+",
-                                [](const double a, const double b) -> double
-                                { return a + b; }, 1);
-    grammar.addBinaryOperator("-",
-                                [](const double a, const double b) -> double
-                                { return a - b; }, 1);
-    grammar.addBinaryOperator("*",
-                                [](const double a, const double b) -> double
-                                { return a * b; }, 2);
-    grammar.addBinaryOperator("/",
-                                [](const double a, const double b) -> double
-                                { return a / b; }, 2);
-    grammar.addBinaryOperator("^", pow, 3);
-
-    grammar.addPostfixOperator("!", [](const double x) -> double
-    {
-        auto n = (size_t) x;
-        size_t result = 1;
-        while (n > 1)
-        {
-            result *= n--;
-        }
-        return (double) result;
-    });
-}
-
-
-REPL::REPL() : m_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)")
-{
-    setupGrammar(m_grammar);
     m_compiler = new polishd::Compiler(m_grammar);
     m_commands["save"] = [&](){save();};
     m_commands["eval"] = [&](){ eval();};
@@ -69,7 +11,7 @@ REPL::REPL() : m_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)")
     m_commands["list-saved"] = [&](){listSaved();};
     m_commands["delete"] = [&](){deleteSaved();};
     m_commands["clear"] = [&](){clear();};
-    m_commands["grammar"] = [&](){grammar();};
+    m_commands["grammar"] = [&](){showGrammar();};
     m_commands["args-info"] = argsInfo;
     m_commands["help"] = help;
 
@@ -189,7 +131,7 @@ void REPL::clear()
     m_functions.clear();
 }
 
-void REPL::grammar()
+void REPL::showGrammar()
 {
     std::cout << "Constants: ";
     for (const auto& pair: m_grammar.constants())

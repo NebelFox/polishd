@@ -13,7 +13,7 @@
 class REPL
 {
 public:
-    REPL();
+    REPL(polishd::Grammar grammar);
 
     void start();
 
@@ -25,7 +25,7 @@ public:
     void deleteSaved();
     void clear();
 
-    void grammar();
+    void showGrammar();
     static void argsInfo();
     static void help();
 
@@ -37,8 +37,6 @@ private:
     std::map<std::string, polishd::Function> m_functions;
     std::map<std::string, std::function<void()>> m_commands;
     const std::regex m_argsPattern;
-private:
-    static void setupGrammar(polishd::Grammar& grammar);
 };
 
 
