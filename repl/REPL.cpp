@@ -38,9 +38,9 @@ void REPL::start()
                 std::cout << "Unknown command" << std::endl;
             std::cout << std::endl;
         }
-        catch (const std::logic_error& e)
+        catch(const std::exception& e)
         {
-            std::cout << e.what() << std::endl;
+            std::cout << "Error: " << e.what() << std::endl;
         }
     }
 }
