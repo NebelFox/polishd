@@ -1,9 +1,8 @@
 #include "REPL.hpp"
 
 
-REPL::REPL(polishd::Grammar grammar) : m_grammar(grammar), m_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)")
+REPL::REPL(polishd::Grammar grammar) : m_compiler(grammar), m_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)")
 {
-    m_compiler = new polishd::Compiler(m_grammar);
     m_commands["save"] = [&](){save();};
     m_commands["eval"] = [&](){ eval();};
     m_commands["evals"] = [&](){ evalSaved();};
@@ -25,16 +24,23 @@ void REPL::start()
     std::cout << std::endl;
     while (running)
     {
-        std::cout << "$ ";
-        std::cin >> keyword;
-        auto lookup = m_commands.find(keyword);
-        if(lookup != m_commands.end())
-            lookup->second();
-        else if(keyword == "exit")
-            running = false;
-        else
-            std::cout << "Unknown command" << std::endl;
-        std::cout << std::endl;
+        try
+        {
+            std::cout << "$ ";
+            std::cin >> keyword;
+            auto lookup = m_commands.find(keyword);
+            if(lookup != m_commands.end())
+                lookup->second();
+            else if(keyword == "exit")
+                running = false;
+            else
+                std::cout << "Unknown command" << std::endl;
+            std::cout << std::endl;
+        }
+        catch (const std::logic_error& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
     }
 }
 
@@ -44,8 +50,7 @@ void REPL::save()
     std::cin >> name >> std::ws;
     std::string expression;
     std::getline(std::cin, expression);
-//        cout << "save | name=[" << name << "] expression=[" << expression << "]\n";
-    m_functions.insert_or_assign(name, m_compiler->compile(expression));
+    m_functions.insert_or_assign(name, m_compiler.compile(expression));
 }
 
 void REPL::eval()
@@ -65,8 +70,7 @@ void REPL::eval()
         args[(*iterator)[1].str()] = std::stod((*iterator)[2].str());
     }
     std::string expression = tail.substr(0, argsBegin);
-//        cout << "Expression: [" << expression << "]\n";
-    polishd::Function f = m_compiler->compile(expression);
+    polishd::Function f = m_compiler.compile(expression);
     double result = f(args);
     std::cout << result << std::endl;
 }
@@ -88,7 +92,7 @@ void REPL::evalSaved()
     if (lookup != m_functions.end())
         std::cout << lookup->second(args) << std::endl;
     else
-        std::cout << "Unknown function: '" << name << '\'' << std::endl;
+        std::cout << "No function with name '" << name << '\'' << std::endl;
 }
 
 void REPL::show()
@@ -105,14 +109,10 @@ void REPL::show()
 
 void REPL::listSaved()
 {
-    if (m_functions.empty())
-    {
-        std::cout << "No functions" << std::endl;
-    }
-    else
+    if(!m_functions.empty())
     {
         for (const auto& pair: m_functions)
-            std::cout << pair.first << ": " << pair.second.infix() << std::endl;
+            std::cout << pair.first << ": " << pair.second.infix();
     }
 }
 
@@ -130,17 +130,18 @@ void REPL::clear()
 
 void REPL::showGrammar()
 {
+    const polishd::Grammar& grammar = m_compiler.grammar();
     std::cout << "Constants: ";
-    for (const auto& pair: m_grammar.constants())
+    for (const auto& pair: grammar.constants())
         std::cout << pair.first << '=' << pair.second << ", ";
     std::cout << std::endl << "Prefix Functions: ";
-    for (const auto& pair: m_grammar.prefix())
+    for (const auto& pair: grammar.prefix())
         std::cout << pair.first << ", ";
     std::cout << std::endl << "Binary Operations (precedence): ";
-    for (const auto& pair: m_grammar.binary())
+    for (const auto& pair: grammar.binary())
         std::cout << pair.first << '(' << (short) pair.second.precedence << "), ";
     std::cout << std::endl << "Postfix Functions: ";
-    for (const auto& pair: m_grammar.postfix())
+    for (const auto& pair: grammar.postfix())
         std::cout << pair.first << ", ";
     std::cout << std::endl;
 }
@@ -184,9 +185,3 @@ void REPL::help()
     );
     std::cout << message;
 }
-
-REPL::~REPL()
-{
-    delete m_compiler;
-}
-
