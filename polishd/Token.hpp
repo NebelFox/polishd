@@ -1,5 +1,5 @@
-#ifndef INC_4_FUNCTIONS_TOKEN_HPP
-#define INC_4_FUNCTIONS_TOKEN_HPP
+#ifndef INC_POLISHD_TOKEN_HPP
+#define INC_POLISHD_TOKEN_HPP
 
 #include <string>
 #include <stack>
@@ -30,4 +30,4 @@ struct Token
 };
 
 
-#endif //INC_4_FUNCTIONS_TOKEN_HPP
+#endif //INC_POLISHD_TOKEN_HPP
