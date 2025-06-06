@@ -1,43 +1,35 @@
-#ifndef INC_4_FUNCTIONS_COMPILER_HPP
-#define INC_4_FUNCTIONS_COMPILER_HPP
-
 #include <iostream>
 #include <stack>
 #include <bitset>
 #include <sstream>
 
-#include "Grammar.hpp"
-#include "Function.hpp"
-#include "Token.hpp"
+#include "Compiler.hpp"
 
+namespace polishd {
 
-class Compiler
-{
-public:
-    explicit Compiler(Grammar& grammar) : _grammar(grammar) {}
-
-private:
-    Grammar _grammar;
-
-public:
-    Function compile(const string& infix)
+    Compiler::Compiler(Grammar& grammar) : m_grammar(grammar) 
     {
-        static const auto
+    }
+
+    Function Compiler::compile(const std::string& infix)
+    {
+        static const TokenType
                 operands = static_cast<TokenType> (TT_NUMBER
-                                                   | TT_ARGUMENT
-                                                   | TT_PREFIX
-                                                   | TT_OPEN);
-        static const auto
+                                                | TT_ARGUMENT
+                                                | TT_PREFIX
+                                                | TT_OPEN);
+        static const TokenType
                 operators = static_cast<TokenType> (TT_BINARY
-                                                    | TT_POSTFIX
-                                                    | TT_CLOSE);
+                                                | TT_POSTFIX
+                                                | TT_CLOSE);
 
         TokenType next = operands;
         std::list<Token> expression;
         std::stack<Token> stack;
 
         size_t length, i = 0;
-        while (infix[i] == ' ') ++i;
+        while (infix[i] == ' ')
+            ++i;
         while (i < infix.size())
         {
             if ((TT_NUMBER & next) && (length = Grammar::matchNumber(infix, i)))
@@ -48,7 +40,7 @@ public:
                 });
                 next = operators;
             }
-            else if ((TT_PREFIX & next) && (length = _grammar.matchPrefix(infix, i)))
+            else if ((TT_PREFIX & next) && (length = m_grammar.matchPrefix(infix, i)))
             {
                 stack.push(Token{
                         .type = TT_PREFIX,
@@ -56,12 +48,12 @@ public:
                 });
                 next = operands;
             }
-            else if ((TT_BINARY & next) && (length = _grammar.matchBinary(infix, i)))
+            else if ((TT_BINARY & next) && (length = m_grammar.matchBinary(infix, i)))
             {
-                string signature = infix.substr(i, length);
-                Grammar::Precedence p = _grammar.precedence(signature);
+                std::string signature = infix.substr(i, length);
+                Grammar::Precedence p = m_grammar.precedenceOf(signature);
                 while (!stack.empty()
-                   && (stack.top().type == TT_PREFIX || _grammar.precedence(stack.top().value) > p))
+                    && (stack.top().type == TT_PREFIX || m_grammar.precedenceOf(stack.top().value) > p))
                 {
                     expression.push_back(stack.top());
                     stack.pop();
@@ -72,7 +64,7 @@ public:
                 });
                 next = operands;
             }
-            else if ((TT_POSTFIX & next) && (length = _grammar.matchPostfix(infix, i)))
+            else if ((TT_POSTFIX & next) && (length = m_grammar.matchPostfix(infix, i)))
             {
                 expression.push_back(Token{
                         .type = TT_POSTFIX,
@@ -111,7 +103,8 @@ public:
                 throw std::logic_error(s.str());
             }
             i += length;
-            while (infix[i] == ' ') ++i;
+            while (infix[i] == ' ')
+                ++i;
         }
         while (!stack.empty())
         {
@@ -124,8 +117,7 @@ public:
                         stringify(expression));
     }
 
-private:
-    std::list<Unit> compile(const std::list<Token>& tokens)
+    std::list<Unit> Compiler::compile(const std::list<Token>& tokens)
     {
         std::list<Unit> expression;
         for (const auto& token: tokens)
@@ -156,23 +148,28 @@ private:
         return expression;
     }
 
-    static Unit CompileNumber(const Token& token)
+    Unit Compiler::CompileNumber(const Token& token)
     {
         double x = stod(token.value);
-        return [x](Stack stack, Args args) -> double
+        return [x](Stack stack, Function::Args args) -> double
         { return x; };
     }
 
-    static Unit CompileArgument(const Token& token)
+    Unit Compiler::CompileArgument(const Token& token)
     {
-        return [name=token.value](Stack stack, Args args) -> double
+        auto lookup = m_grammar.constants().find(token.value);
+        if(lookup != m_grammar.constants().end()) {
+            return [value=lookup->second](Stack stack, Function::Args args) -> double
+            { return value; };
+        }
+        return [name=token.value](Stack stack, Function::Args args) -> double
         { return args.at(name); };
     }
 
-    static Unit CompileUnary(const Token& token, const std::map<string, Grammar::Unary>& registry)
+    Unit Compiler::CompileUnary(const Token& token, const std::map<std::string, Grammar::Unary>& registry)
     {
         const Grammar::Unary& unary = registry.at(token.value);
-        return [unary](Stack stack, Args args) -> double
+        return [unary](Stack stack, Function::Args args) -> double
         {
             double x = stack.top();
             stack.pop();
@@ -180,37 +177,35 @@ private:
         };
     }
 
-    Unit CompilePrefix(const Token& token)
+    Unit Compiler::CompilePrefix(const Token& token)
     {
-        return CompileUnary(token, _grammar.prefix());
+        return CompileUnary(token, m_grammar.prefix());
     }
 
-    Unit CompilePostfix(const Token& token)
+    Unit Compiler::CompilePostfix(const Token& token)
     {
-        return CompileUnary(token, _grammar.postfix());
+        return CompileUnary(token, m_grammar.postfix());
     }
 
-    Unit CompileBinary(const Token& token)
+    Unit Compiler::CompileBinary(const Token& token)
     {
-        const Grammar::Binary& binary = _grammar.binary().at(token.value).binary;
-        return [binary](Stack stack, Args args) -> double
+        const Grammar::Binary& binary = m_grammar.binary().at(token.value).binary;
+        return [binary](Stack stack, Function::Args args) -> double
         {
-            double a = stack.top();
-            stack.pop();
             double b = stack.top();
             stack.pop();
-            return binary(b, a);
+            double a = stack.top();
+            stack.pop();
+            return binary(a, b);
         };
     }
 
-    static string stringify(const std::list<Token>& tokens)
+    std::string Compiler::stringify(const std::list<Token>& tokens)
     {
         std::stringstream stream;
         for(const Token& token : tokens)
             stream << token.value << ' ';
         return stream.str();
     }
-};
 
-
-#endif //INC_4_FUNCTIONS_COMPILER_HPP
+} // namespace polishd
