@@ -26,7 +26,6 @@ public:
     void clear();
 
     void showGrammar();
-    static void argsInfo();
     static void help();
 
 private:

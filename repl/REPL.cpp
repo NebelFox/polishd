@@ -11,7 +11,6 @@ REPL::REPL(polishd::Grammar grammar) : m_compiler(grammar), m_argsPattern("(?:([
     m_commands["delete"] = [&](){deleteSaved();};
     m_commands["clear"] = [&](){clear();};
     m_commands["grammar"] = [&](){showGrammar();};
-    m_commands["args-info"] = argsInfo;
     m_commands["help"] = help;
 
 }
@@ -146,22 +145,6 @@ void REPL::showGrammar()
     std::cout << std::endl;
 }
 
-void REPL::argsInfo()
-{
-    static const std::string message(
-            "#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#\n"
-            "# 'args...' is a sequence of 'name=value' pairs, where:   #\n"
-            "# > name - argument signature to seek in function for     #\n"
-            "# > value - int or float number to substitute 'name' with #\n"
-            "#=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#\n"
-            "# Pairs should be separated with at least one whitespace  #\n"
-            "# Order of pairs does not matter                          #\n"
-            "# Extra pairs are ignored                                 #\n"
-            "#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#\n"
-    );
-    std::cout << message;
-}
-
 void REPL::help()
 {
     static const std::string message(
@@ -178,9 +161,18 @@ void REPL::help()
             "# > clear       - delete all functions                          #\n"
             "#=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#\n"
             "# > grammar    - all available operators and constants          #\n"
-            "# > args-info  - guide on args                                  #\n"
             "# > help       - general app usage guide                        #\n"
             "# > exit       - terminate the program                          #\n"
+            "#=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#\n"
+            "# ARGUMENTS (args...):                                          #\n"
+            "#=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#\n"
+            "# 'args...' is a sequence of 'name=value' pairs, where:         #\n"
+            "# > name - argument signature to seek in function for           #\n"
+            "# > value - int or float number to substitute 'name' with       #\n"
+            "#=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#\n"
+            "# Pairs should be separated with at least one whitespace        #\n"
+            "# Order of pairs does not matter                                #\n"
+            "# Extra pairs are ignored                                       #\n"
             "#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#\n"
     );
     std::cout << message;
