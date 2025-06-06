@@ -1,7 +1,8 @@
 #ifndef INC_4_FUNCTIONS_CALCULATOR_HPP
 #define INC_4_FUNCTIONS_CALCULATOR_HPP
 
-
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <regex>
 #include <functional>
 
