@@ -8,31 +8,34 @@
 
 #include "Token.hpp"
 
-class Function
-{
-    friend class Compiler;
-public:
-    using Args = std::map<std::string, double>;
-    
-    explicit Function(const std::list<Unit>& expression,
-                      const std::string& infix,
-                      const std::string& postfix);
+namespace polishd {
 
-    
-    [[nodiscard]] const std::string& postfix() const;    
-    [[nodiscard]] const std::string& infix() const;
-    
-    [[nodiscard]] double evaluate(const Args& args) const;
-    [[nodiscard]] double evaluate() const;
+    class Function
+    {
+        friend class Compiler;
+    public:
+        using Args = std::map<std::string, double>;
+        
+        explicit Function(const std::list<Unit>& expression,
+                        const std::string& infix,
+                        const std::string& postfix);
 
-    double operator()(const Args& args) const;
-    double operator()() const;
+        
+        [[nodiscard]] const std::string& postfix() const;    
+        [[nodiscard]] const std::string& infix() const;
+        
+        [[nodiscard]] double evaluate(const Args& args) const;
+        [[nodiscard]] double evaluate() const;
 
-private:
-    std::string m_infix;
-    std::string m_postfix;
-    std::list<Unit> m_expression;
-};
+        double operator()(const Args& args) const;
+        double operator()() const;
 
+    private:
+        std::string m_infix;
+        std::string m_postfix;
+        std::list<Unit> m_expression;
+    };
+
+} // namespace polishd
 
 #endif //INC_POLISHD_FUNCTION_HPP

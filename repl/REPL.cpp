@@ -4,7 +4,7 @@
 #include "REPL.hpp"
 
 
-void REPL::setupGrammar(Grammar& grammar)
+void REPL::setupGrammar(polishd::Grammar& grammar)
 {
     grammar.addConstant("pi", M_PI);
     grammar.addConstant("e", M_E);
@@ -61,7 +61,7 @@ void REPL::setupGrammar(Grammar& grammar)
 REPL::REPL() : m_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)")
 {
     setupGrammar(m_grammar);
-    m_compiler = new Compiler(m_grammar);
+    m_compiler = new polishd::Compiler(m_grammar);
     m_commands["save"] = [&](){save();};
     m_commands["eval"] = [&](){ eval();};
     m_commands["evals"] = [&](){ evalSaved();};
@@ -117,14 +117,14 @@ void REPL::eval()
     size_t argsBegin = std::string::npos;
     if(iterator != end)
         argsBegin = (*iterator).position(0);
-    Function::Args args;
+    polishd::Function::Args args;
     for(; iterator != end; ++iterator)
     {
         args[(*iterator)[1].str()] = std::stod((*iterator)[2].str());
     }
     std::string expression = tail.substr(0, argsBegin);
 //        cout << "Expression: [" << expression << "]\n";
-    Function f = m_compiler->compile(expression);
+    polishd::Function f = m_compiler->compile(expression);
     double result = f(args);
     std::cout << "The result = " << result << std::endl;
 }
@@ -133,7 +133,7 @@ void REPL::evalSaved()
 {
     std::string name;
     std::cin >> name >> std::ws;
-    Function::Args args;
+    polishd::Function::Args args;
     std::string tail;
     std::getline(std::cin, tail);
     auto iterator = std::sregex_iterator(tail.begin(),

@@ -32,13 +32,13 @@ public:
     ~REPL();
 
 private:
-    Grammar m_grammar;
-    Compiler* m_compiler;
-    std::map<std::string, Function> m_functions;
+    polishd::Grammar m_grammar;
+    polishd::Compiler* m_compiler;
+    std::map<std::string, polishd::Function> m_functions;
     std::map<std::string, std::function<void()>> m_commands;
     const std::regex m_argsPattern;
 private:
-    static void setupGrammar(Grammar& grammar);
+    static void setupGrammar(polishd::Grammar& grammar);
 };
 
 
