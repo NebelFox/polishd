@@ -12,6 +12,8 @@ namespace polishd {
     public:
         explicit Compiler(Grammar& grammar);
 
+        const Grammar& grammar() const;
+        
         Function compile(const std::string& infix);
 
     private:

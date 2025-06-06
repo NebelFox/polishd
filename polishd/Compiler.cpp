@@ -11,19 +11,14 @@ namespace polishd {
     {
     }
 
+    const Grammar& Compiler::grammar() const
+    {
+        return m_grammar;
+    }
+
     Function Compiler::compile(const std::string& infix)
     {
-        static const TokenType
-                operands = static_cast<TokenType> (TT_NUMBER
-                                                | TT_ARGUMENT
-                                                | TT_PREFIX
-                                                | TT_OPEN);
-        static const TokenType
-                operators = static_cast<TokenType> (TT_BINARY
-                                                | TT_POSTFIX
-                                                | TT_CLOSE);
-
-        TokenType next = operands;
+        bool expectOperand = false;
         std::list<Token> expression;
         std::stack<Token> stack;
 
@@ -32,75 +27,77 @@ namespace polishd {
             ++i;
         while (i < infix.size())
         {
-            if ((TT_NUMBER & next) && (length = Grammar::matchNumber(infix, i)))
-            {
-                expression.push_back(Token{
-                        .type = TT_NUMBER,
-                        .value = infix.substr(i, length)
-                });
-                next = operators;
-            }
-            else if ((TT_PREFIX & next) && (length = m_grammar.matchPrefix(infix, i)))
-            {
-                stack.push(Token{
-                        .type = TT_PREFIX,
-                        .value = infix.substr(i, length)
-                });
-                next = operands;
-            }
-            else if ((TT_BINARY & next) && (length = m_grammar.matchBinary(infix, i)))
-            {
-                std::string signature = infix.substr(i, length);
-                Grammar::Precedence p = m_grammar.precedenceOf(signature);
-                while (!stack.empty()
-                    && (stack.top().type == TT_PREFIX || m_grammar.precedenceOf(stack.top().value) > p))
+            if(expectOperand) {
+                if((length = Grammar::matchNumber(infix, i)))
                 {
-                    expression.push_back(stack.top());
+                    expression.push_back(Token{
+                            .type = TokenType::Number,
+                            .value = infix.substr(i, length)
+                    });
+                    // next = operators;
+                    expectOperand = false;
+                }
+                else if((length = m_grammar.matchPrefix(infix, i)))
+                {
+                    stack.push(Token{
+                            .type = TokenType::Prefix,
+                            .value = infix.substr(i, length)
+                    });
+                }
+                else if((length = infix[i] == '('))
+                {
+                    stack.push(Token{.type = TokenType::Opening});
+                }
+                else if((length = Grammar::matchArgument(infix, i)))
+                {
+                    expression.push_back(Token{
+                            .type = TokenType::Argument,
+                            .value = infix.substr(i, length)
+                    });
+                    expectOperand = false;
+                }
+                else
+                {
+                    throw std::logic_error("Expected a number, an argument, a prefix function or an opening parenthesis");
+                }
+            } else
+            {
+                if((length = m_grammar.matchBinary(infix, i)))
+                {
+                    std::string signature = infix.substr(i, length);
+                    Grammar::Precedence p = m_grammar.precedenceOf(signature);
+                    while (!stack.empty()
+                        && (stack.top().type == TokenType::Prefix || m_grammar.precedenceOf(stack.top().value) > p))
+                    {
+                        expression.push_back(stack.top());
+                        stack.pop();
+                    }
+                    stack.push(Token{
+                            .type = TokenType::Binary,
+                            .value = signature
+                    });
+                    expectOperand = true;
+                }
+                else if ((length = m_grammar.matchPostfix(infix, i)))
+                {
+                    expression.push_back(Token{
+                            .type = TokenType::Postfix,
+                            .value = infix.substr(i, length)
+                    });
+                }
+                else if ((length = (infix[i] == ')')))
+                {
+                    while (stack.top().type != TokenType::Opening)
+                    {
+                        expression.push_back(stack.top());
+                        stack.pop();
+                    }
                     stack.pop();
                 }
-                stack.push(Token{
-                        .type = TT_BINARY,
-                        .value = signature
-                });
-                next = operands;
-            }
-            else if ((TT_POSTFIX & next) && (length = m_grammar.matchPostfix(infix, i)))
-            {
-                expression.push_back(Token{
-                        .type = TT_POSTFIX,
-                        .value = infix.substr(i, length)
-                });
-                next = operators;
-            }
-            else if ((TT_OPEN & next) && (length = infix[i] == '('))
-            {
-                stack.push(Token{.type = TT_OPEN});
-                next = operands;
-            }
-            else if ((TT_CLOSE & next) && (length = (infix[i] == ')')))
-            {
-                while (stack.top().type != TT_OPEN)
+                else
                 {
-                    expression.push_back(stack.top());
-                    stack.pop();
+                    throw std::logic_error("Expected a binary operator, a postfix function or a closing parenthesis");
                 }
-                stack.pop();
-                next = operators;
-            }
-            else if ((TT_ARGUMENT & next) && (length = Grammar::matchArgument(infix, i)))
-            {
-                expression.push_back(Token{
-                        .type = TT_ARGUMENT,
-                        .value = infix.substr(i, length)
-                });
-                next = operators;
-            }
-            else
-            {
-                std::bitset<8> b(next);
-                std::stringstream s;
-                s << "Unexpected token at " << i << "; UnitGroup: " << b;
-                throw std::logic_error(s.str());
             }
             i += length;
             while (infix[i] == ' ')
@@ -124,24 +121,24 @@ namespace polishd {
         {
             switch (token.type)
             {
-                case TT_NUMBER:
+                case TokenType::Number:
                     expression.push_back(CompileNumber(token));
                     break;
-                case TT_ARGUMENT:
+                case TokenType::Argument:
                     expression.push_back(CompileArgument(token));
                     break;
-                case TT_PREFIX:
+                case TokenType::Prefix:
                     expression.push_back(CompilePrefix(token));
                     break;
-                case TT_BINARY:
+                case TokenType::Binary:
                     expression.push_back(CompileBinary(token));
                     break;
-                case TT_POSTFIX:
+                case TokenType::Postfix:
                     expression.push_back(CompilePostfix(token));
                     break;
                 default:
                     std::stringstream s;
-                    s << "Unhandled TokenType: " << token.type;
+                    s << "Unhandled TokenType: " << static_cast<unsigned short>(token.type);
                     throw std::logic_error(s.str());
             }
         }
