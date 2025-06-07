@@ -119,7 +119,7 @@ void REPL::listSaved()
     if(!m_functions.empty())
     {
         for (const auto& pair: m_functions)
-            std::cout << pair.first << ": " << pair.second.infix;
+            std::cout << pair.first << ": " << pair.second.infix << std::endl;
     }
 }
 
