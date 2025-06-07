@@ -2,6 +2,7 @@
 #define INC_POLISHD_CALCULATOR_HPP
 
 #include <iostream>
+#include <unordered_map>
 #include <regex>
 #include <functional>
 
@@ -30,8 +31,8 @@ public:
 
 private:
     polishd::Compiler m_compiler;
-    std::map<std::string, polishd::Function> m_functions;
-    std::map<std::string, std::function<void()>> m_commands;
+    std::unordered_map<std::string, polishd::Function> m_functions;
+    std::unordered_map<std::string, std::function<void()>> m_commands;
     static const std::regex s_argsPattern;
 };
 
