@@ -16,7 +16,7 @@ namespace polishd {
         return m_grammar;
     }
 
-    Function Compiler::compile(const std::string& infix)
+    Function Compiler::compile(const std::string& infix) const
     {
         bool expectOperand = true;
         std::list<Token> expression;
@@ -114,7 +114,7 @@ namespace polishd {
                         stringify(expression));
     }
 
-    std::list<Unit> Compiler::compile(const std::list<Token>& tokens)
+    std::list<Unit> Compiler::compile(const std::list<Token>& tokens) const
     {
         std::list<Unit> expression;
         for (const auto& token: tokens)
@@ -152,7 +152,7 @@ namespace polishd {
         { return x; };
     }
 
-    Unit Compiler::CompileArgument(const Token& token)
+    Unit Compiler::CompileArgument(const Token& token) const
     {
         auto lookup = m_grammar.constants().find(token.value);
         if(lookup != m_grammar.constants().end()) {
@@ -174,17 +174,17 @@ namespace polishd {
         };
     }
 
-    Unit Compiler::CompilePrefix(const Token& token)
+    Unit Compiler::CompilePrefix(const Token& token) const
     {
         return CompileUnary(token, m_grammar.prefix());
     }
 
-    Unit Compiler::CompilePostfix(const Token& token)
+    Unit Compiler::CompilePostfix(const Token& token) const
     {
         return CompileUnary(token, m_grammar.postfix());
     }
 
-    Unit Compiler::CompileBinary(const Token& token)
+    Unit Compiler::CompileBinary(const Token& token) const
     {
         const Grammar::Binary& binary = m_grammar.binary().at(token.value).binary;
         return [binary](Stack stack, Function::Args args) -> double
