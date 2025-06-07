@@ -10,6 +10,10 @@
 
 namespace polishd {
 
+    using Stack = std::stack<double>&;
+    using Args = const std::map<std::string, double>&;
+    using Unit = std::function<double (Stack, Args)>;
+
     class Function
     {
         friend class Compiler;

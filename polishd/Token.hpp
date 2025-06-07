@@ -8,11 +8,6 @@
 
 namespace polishd {
 
-    using Stack = std::stack<double>&;
-    using Args = const std::map<std::string, double>&;
-    using Unit = std::function<double (Stack, Args)>;
-
-
     enum class TokenType : unsigned char
     {
         None = 0,
@@ -24,7 +19,6 @@ namespace polishd {
         Closing,
         Argument
     };
-
 
     struct Token
     {
