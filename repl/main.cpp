@@ -3,7 +3,6 @@
 
 #include "REPL.hpp"
 
-
 static void setupDemoGrammar(polishd::Grammar& grammar)
 {
     // constants

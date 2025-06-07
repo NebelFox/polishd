@@ -1,12 +1,11 @@
 #ifndef INC_POLISHD_FUNCTION_HPP
 #define INC_POLISHD_FUNCTION_HPP
 
+#include "Token.hpp"
 
 #include <string>
 #include <map>
 #include <list>
-
-#include "Token.hpp"
 
 namespace polishd {
 

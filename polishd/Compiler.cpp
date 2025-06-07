@@ -1,9 +1,9 @@
+#include "Compiler.hpp"
+
 #include <iostream>
 #include <stack>
 #include <bitset>
 #include <sstream>
-
-#include "Compiler.hpp"
 
 namespace polishd {
 
@@ -57,7 +57,7 @@ namespace polishd {
                 }
                 else
                 {
-                    throw std::logic_error("Expected a number, an argument, a prefix function or an opening parenthesis");
+                    throw std::logic_error("Expected a number, an argument, a prefix function or an opening parenthesis starting at " + infix.substr(i));
                 }
             }
             else
@@ -96,7 +96,7 @@ namespace polishd {
                 }
                 else
                 {
-                    throw std::logic_error("Expected a binary operator, a postfix function or a closing parenthesis");
+                    throw std::logic_error("Expected a binary operator, a postfix function or a closing parenthesis starting at " + infix.substr(i));
                 }
             }
             i += length;

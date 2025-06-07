@@ -9,7 +9,6 @@
 #include "Compiler.hpp"
 #include "Function.hpp"
 
-
 class REPL
 {
 public:

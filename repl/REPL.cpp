@@ -1,8 +1,7 @@
-#include <iostream>
-#include <functional>
-
 #include "REPL.hpp"
 
+#include <iostream>
+#include <functional>
 
 const std::regex REPL::s_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)");
 
