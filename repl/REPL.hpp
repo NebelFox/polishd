@@ -1,7 +1,6 @@
 #ifndef INC_POLISHD_CALCULATOR_HPP
 #define INC_POLISHD_CALCULATOR_HPP
 
-#include <iostream>
 #include <unordered_map>
 #include <regex>
 #include <functional>

@@ -1,3 +1,6 @@
+#include <iostream>
+#include <functional>
+
 #include "REPL.hpp"
 
 
@@ -5,16 +8,17 @@ const std::regex REPL::s_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)");
 
 REPL::REPL(polishd::Grammar& grammar) : m_compiler(grammar)
 {
-    m_commands["save"] = [&](){save();};
-    m_commands["eval"] = [&](){ eval();};
-    m_commands["evals"] = [&](){ evalSaved();};
-    m_commands["show"] = [&](){show();};
-    m_commands["list"] = [&](){listSaved();};
-    m_commands["delete"] = [&](){deleteSaved();};
-    m_commands["clear"] = [&](){clear();};
-    m_commands["grammar"] = [&](){showGrammar();};
+    #define BIND(METHOD) std::bind(&METHOD, this);
+    m_commands["save"] = BIND(save);
+    m_commands["eval"] = BIND(eval);
+    m_commands["evals"] = BIND(evalSaved);
+    m_commands["show"] = BIND(show);
+    m_commands["list"] = BIND(listSaved);
+    m_commands["delete"] = BIND(deleteSaved);
+    m_commands["clear"] = BIND(clear);
+    m_commands["grammar"] = BIND(showGrammar);
     m_commands["help"] = help;
-
+    #undef BIND
 }
 
 void REPL::start()
