@@ -34,9 +34,7 @@ namespace polishd {
         const std::string postfix;
 
     private:
-        std::string m_infix;
-        std::string m_postfix;
-        std::list<Unit> m_expression;
+        const std::list<Unit> m_expression;
     };
 
 } // namespace polishd
