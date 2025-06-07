@@ -3,10 +3,9 @@
 namespace polishd {
 
     Function::Function(const std::list<Unit>& expression,
-                    const std::string& infix,
+                       const std::string& infix,
                        const std::string& postfix) : m_expression(expression), infix(infix), postfix(postfix)
     {
-        return m_infix;
     }
 
     double Function::evaluate(const Args& args) const

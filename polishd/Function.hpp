@@ -20,8 +20,8 @@ namespace polishd {
         using Args = std::map<std::string, double>;
         
         explicit Function(const std::list<Unit>& expression,
-                        const std::string& infix,
-                        const std::string& postfix);
+                          const std::string& infix,
+                          const std::string& postfix);
         
         [[nodiscard]] double evaluate(const Args& args) const;
         [[nodiscard]] double evaluate() const;
