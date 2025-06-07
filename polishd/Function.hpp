@@ -16,7 +16,6 @@ namespace polishd {
 
     class Function
     {
-        friend class Compiler;
     public:
         using Args = std::map<std::string, double>;
         
