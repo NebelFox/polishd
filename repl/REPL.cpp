@@ -87,17 +87,20 @@ void REPL::evalSaved()
     polishd::Function::Args args;
     std::string tail;
     std::getline(std::cin, tail);
+    auto lookup = m_functions.find(name);
+    if(lookup == m_functions.end())
+    {
+        std::cout << "No function with name '" << name << '\'' << std::endl;
+        return;
+    }
+    
     auto iterator = std::sregex_iterator(tail.begin(),
                                          tail.end(),
                                          s_argsPattern);
     auto end = std::sregex_iterator();
     for (; iterator != end; ++iterator)
         args.insert_or_assign((*iterator)[1].str(), std::stod((*iterator)[2].str()));
-    auto lookup = m_functions.find(name);
-    if (lookup != m_functions.end())
         std::cout << lookup->second(args) << std::endl;
-    else
-        std::cout << "No function with name '" << name << '\'' << std::endl;
 }
 
 void REPL::show()
