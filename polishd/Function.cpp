@@ -4,19 +4,7 @@ namespace polishd {
 
     Function::Function(const std::list<Unit>& expression,
                     const std::string& infix,
-                    const std::string& postfix)
-    {
-        m_expression = expression;
-        m_infix = infix;
-        m_postfix = postfix;
-    }
-
-    const std::string& Function::postfix() const
-    {
-        return m_postfix;
-    }
-
-    const std::string& Function::infix() const
+                       const std::string& postfix) : m_expression(expression), infix(infix), postfix(postfix)
     {
         return m_infix;
     }

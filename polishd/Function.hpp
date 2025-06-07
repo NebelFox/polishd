@@ -19,16 +19,15 @@ namespace polishd {
         explicit Function(const std::list<Unit>& expression,
                         const std::string& infix,
                         const std::string& postfix);
-
-        
-        [[nodiscard]] const std::string& postfix() const;    
-        [[nodiscard]] const std::string& infix() const;
         
         [[nodiscard]] double evaluate(const Args& args) const;
         [[nodiscard]] double evaluate() const;
 
         double operator()(const Args& args) const;
         double operator()() const;
+    public:
+        const std::string infix;
+        const std::string postfix;
 
     private:
         std::string m_infix;
