@@ -11,42 +11,24 @@ static void setupDemoGrammar(polishd::Grammar& grammar)
     grammar.addConstant("e", M_E);
 
     // prefix operators
-    grammar.addPrefixOperator("-",
-                                [](const double x) -> double
-                                { return -x; });
-    grammar.addPrefixOperator("exp",
-                                [](const double x) -> double
-                                { return std::exp(x); });
-    grammar.addPrefixOperator("sin",
-                                [](const double x) -> double
-                                { return std::sin(x); });
-    grammar.addPrefixOperator("cos",
-                                [](const double x) -> double
-                                { return std::cos(x); });
-    grammar.addPrefixOperator("floor",
-                                [](const double x) -> double
-                                { return std::floor(x); });
-    grammar.addPrefixOperator("ceil",
-                                [](const double x) -> double
-                                { return std::ceil(x); });
-    grammar.addPrefixOperator("round",
-                                [](const double x) -> double
-                                { return std::round(x); });
+    #define UNARY(EXPR_ON_X) [](const double x) -> double { return EXPR_ON_X; }
+    grammar.addPrefixOperator("-", UNARY(-x));
+    grammar.addPrefixOperator("exp", UNARY(std::exp(x)));
+    grammar.addPrefixOperator("sin", UNARY(std::sin(x)));
+    grammar.addPrefixOperator("cos", UNARY(std::cos(x)));
+    grammar.addPrefixOperator("floor", UNARY(std::floor(x)));
+    grammar.addPrefixOperator("ceil", UNARY(std::ceil(x)));
+    grammar.addPrefixOperator("round", UNARY(std::round(x)));
+    #undef UNARY
     
     // binary operators
-    grammar.addBinaryOperator("+",
-                                [](const double a, const double b) -> double
-                                { return a + b; }, 1);
-    grammar.addBinaryOperator("-",
-                                [](const double a, const double b) -> double
-                                { return a - b; }, 1);
-    grammar.addBinaryOperator("*",
-                                [](const double a, const double b) -> double
-                                { return a * b; }, 2);
-    grammar.addBinaryOperator("/",
-                                [](const double a, const double b) -> double
-                                { return a / b; }, 2);
+    #define BINARY(EXPR_ON_A_B) [](const double a, const double b) -> double { return EXPR_ON_A_B; }
+    grammar.addBinaryOperator("+", BINARY(a+b), 1);
+    grammar.addBinaryOperator("-", BINARY(a-b), 1);
+    grammar.addBinaryOperator("*", BINARY(a*b), 2);
+    grammar.addBinaryOperator("/", BINARY(a/b), 2);
     grammar.addBinaryOperator("^", pow, 3);
+    #undef BINARY
 
     // postfix operators
     grammar.addPostfixOperator("!", [](const double x) -> double
