@@ -61,20 +61,8 @@ void REPL::eval()
 {
     std::string tail;
     std::getline(std::cin >> std::ws, tail);
-    auto iterator = std::sregex_iterator(tail.begin(),
-                                         tail.end(),
-                                         s_argsPattern);
-    auto end = std::sregex_iterator();
-    size_t argsBegin = std::string::npos;
-    if(iterator != end)
-        argsBegin = (*iterator).position(0);
-    polishd::Function::Args args;
-    for(; iterator != end; ++iterator)
-    {
-        args[(*iterator)[1].str()] = std::stod((*iterator)[2].str());
-    }
-    std::string expression = tail.substr(0, argsBegin);
-    polishd::Function f = m_compiler.compile(expression);
+    auto [start, args] = parseArgs(tail);
+    polishd::Function f = m_compiler.compile(tail.substr(0, start));
     double result = f(args);
     std::cout << result << std::endl;
 }
@@ -83,7 +71,6 @@ void REPL::evalSaved()
 {
     std::string name;
     std::cin >> name >> std::ws;
-    polishd::Function::Args args;
     std::string tail;
     std::getline(std::cin, tail);
     auto lookup = m_functions.find(name);
@@ -92,14 +79,9 @@ void REPL::evalSaved()
         std::cout << "No function with name '" << name << '\'' << std::endl;
         return;
     }
-    
-    auto iterator = std::sregex_iterator(tail.begin(),
-                                         tail.end(),
-                                         s_argsPattern);
-    auto end = std::sregex_iterator();
-    for (; iterator != end; ++iterator)
-        args.insert_or_assign((*iterator)[1].str(), std::stod((*iterator)[2].str()));
-    std::cout << lookup->second(args) << std::endl;
+    polishd::Function::Args args = parseArgs(tail).second;
+    double result = lookup->second(args);
+    std::cout << result << std::endl;
 }
 
 void REPL::show()

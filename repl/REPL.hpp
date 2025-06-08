@@ -1,6 +1,7 @@
 #ifndef INC_POLISHD_CALCULATOR_HPP
 #define INC_POLISHD_CALCULATOR_HPP
 
+#include <string>
 #include <unordered_map>
 #include <regex>
 #include <functional>
@@ -28,11 +29,12 @@ public:
     static void help();
 
 private:
+    static std::pair<size_t, polishd::Function::Args> parseArgs(const std::string& s); 
+private:
     polishd::Compiler m_compiler;
     std::unordered_map<std::string, polishd::Function> m_functions;
     std::unordered_map<std::string, std::function<void()>> m_commands;
     static const std::regex s_argsPattern;
 };
-
 
 #endif //INC_POLISHD_CALCULATOR_HPP
