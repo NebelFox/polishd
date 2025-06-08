@@ -23,7 +23,7 @@ namespace polishd {
     struct Token
     {
         TokenType type;
-        std::string value;
+        std::string value {};
     };
 
 } // namespace polishd
