@@ -163,7 +163,7 @@ namespace polishd {
         { return args.at(name); };
     }
 
-    Unit Compiler::CompileUnary(const Token& token, const std::map<std::string, Grammar::Unary>& registry)
+    Unit Compiler::CompileUnary(const Token& token, const std::unordered_map<std::string, Grammar::Unary>& registry)
     {
         const Grammar::Unary& unary = registry.at(token.value);
         return [unary](Stack stack, Function::Args args) -> double

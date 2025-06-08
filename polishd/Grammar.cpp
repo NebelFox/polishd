@@ -2,22 +2,22 @@
 
 namespace polishd {
 
-    const std::map<std::string, double>& Grammar::constants() const
+    const std::unordered_map<std::string, double>& Grammar::constants() const
     {
         return m_constants;
     }
 
-    const std::map<std::string, Grammar::Unary>& Grammar::prefix() const
+    const std::unordered_map<std::string, Grammar::Unary>& Grammar::prefix() const
     {
         return m_prefixOperators;
     }
 
-    const std::map<std::string, Grammar::BinaryOperator>& Grammar::binary() const
+    const std::unordered_map<std::string, Grammar::BinaryOperator>& Grammar::binary() const
     {
         return m_binaryOperators;
     }
 
-    const std::map<std::string, Grammar::Unary>& Grammar::postfix() const
+    const std::unordered_map<std::string, Grammar::Unary>& Grammar::postfix() const
     {
         return m_postfixOperators;
     }

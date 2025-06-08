@@ -20,7 +20,7 @@ namespace polishd {
         std::list<Unit> compile(const std::list<Token>& tokens) const;
 
         static Unit CompileNumber(const Token& token);
-        static Unit CompileUnary(const Token& token, const std::map<std::string, Grammar::Unary>& registry);
+        static Unit CompileUnary(const Token& token, const std::unordered_map<std::string, Grammar::Unary>& registry);
 
         Unit CompileArgument(const Token& token) const;
         Unit CompilePrefix(const Token& token) const;
