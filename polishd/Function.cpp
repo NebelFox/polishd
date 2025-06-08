@@ -4,7 +4,7 @@ namespace polishd {
 
     Function::Function(const std::list<Unit>& expression,
                        const std::string& infix,
-                       const std::string& postfix) : m_expression(expression), infix(infix), postfix(postfix)
+                       const std::string& postfix) : m_expression(expression), m_infix(infix), m_postfix(postfix)
     {
     }
 
@@ -30,6 +30,16 @@ namespace polishd {
     double Function::operator()() const
     {
         return evaluate();
+    }
+
+    const std::string& Function::infix() const
+    {
+        return m_infix;
+    }
+
+    const std::string& Function::postfix() const
+    {
+        return m_postfix;
     }
 
 } // namespace polishd

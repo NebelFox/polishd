@@ -109,8 +109,8 @@ void REPL::show()
     auto lookup = m_functions.find(name);
     if (lookup != m_functions.end())
     {
-        std::cout << "Infix form: " << lookup->second.infix << std::endl
-                  << "Postfix form: " << lookup->second.postfix << std::endl;
+        std::cout << "Infix form: " << lookup->second.infix() << std::endl
+                  << "Postfix form: " << lookup->second.postfix() << std::endl;
     }
 }
 
@@ -119,7 +119,7 @@ void REPL::listSaved()
     if(!m_functions.empty())
     {
         for (const auto& pair: m_functions)
-            std::cout << pair.first << ": " << pair.second.infix << std::endl;
+            std::cout << pair.first << ": " << pair.second.infix() << std::endl;
     }
 }
 

@@ -27,12 +27,14 @@ namespace polishd {
 
         double operator()(const Args& args) const;
         double operator()() const;
-    public:
-        const std::string infix;
-        const std::string postfix;
+
+        const std::string& infix() const;
+        const std::string& postfix() const;
 
     private:
-        const std::list<Unit> m_expression;
+        std::list<Unit> m_expression;
+        std::string m_infix;
+        std::string m_postfix;
     };
 
 } // namespace polishd
