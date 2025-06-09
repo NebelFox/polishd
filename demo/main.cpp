@@ -18,6 +18,7 @@ static void setupDemoGrammar(polishd::Grammar& grammar)
     grammar.addPrefixOperator("floor", UNARY(std::floor(x)));
     grammar.addPrefixOperator("ceil", UNARY(std::ceil(x)));
     grammar.addPrefixOperator("round", UNARY(std::round(x)));
+    grammar.addPrefixOperator("abs", UNARY(std::abs(x)));
     #undef UNARY
     
     // binary operators
