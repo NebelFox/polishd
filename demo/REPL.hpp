@@ -6,9 +6,7 @@
 #include <regex>
 #include <functional>
 
-#include "Grammar.hpp"
-#include "Compiler.hpp"
-#include "Function.hpp"
+#include <polishd.hpp>
 
 class REPL
 {
