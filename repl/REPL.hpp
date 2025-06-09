@@ -29,7 +29,7 @@ public:
     static void help();
 
 private:
-    static std::pair<size_t, polishd::Function::Args> parseArgs(const std::string& s); 
+    static std::pair<size_t, polishd::Args> parseArgs(const std::string& s); 
 private:
     polishd::Compiler m_compiler;
     std::unordered_map<std::string, polishd::Function> m_functions;

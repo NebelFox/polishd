@@ -10,7 +10,7 @@ namespace polishd {
 
     double Function::evaluate(const Args& args) const
     {
-        std::stack<double> stack;
+        Stack stack;
         for (const Unit& unit: m_expression)
             stack.push(unit(stack, args));
         return stack.top();

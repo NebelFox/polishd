@@ -148,25 +148,29 @@ namespace polishd {
     Unit Compiler::CompileNumber(const Token& token)
     {
         double x = stod(token.value);
-        return [x](Stack stack, Function::Args args) -> double
-        { return x; };
+        return [x](Stack& stack, const Args& args) -> double
+        { 
+            return x;
+        };
     }
 
     Unit Compiler::CompileArgument(const Token& token) const
     {
         auto lookup = m_grammar.constants().find(token.value);
         if(lookup != m_grammar.constants().end()) {
-            return [value=lookup->second](Stack stack, Function::Args args) -> double
+            return [value=lookup->second](Stack& stack, const Args& args) -> double
             { return value; };
         }
-        return [name=token.value](Stack stack, Function::Args args) -> double
-        { return args.at(name); };
+        return [name=token.value](Stack& stack, const Args& args) -> double
+        { 
+            return args.at(name);
+        };
     }
 
     Unit Compiler::CompileUnary(const Token& token, const std::unordered_map<std::string, Grammar::Unary>& registry)
     {
         const Grammar::Unary& unary = registry.at(token.value);
-        return [unary](Stack stack, Function::Args args) -> double
+        return [unary](Stack& stack, const Args& args) -> double
         {
             double x = stack.top();
             stack.pop();
@@ -187,7 +191,7 @@ namespace polishd {
     Unit Compiler::CompileBinary(const Token& token) const
     {
         const Grammar::Binary& binary = m_grammar.binary().at(token.value).binary;
-        return [binary](Stack stack, Function::Args args) -> double
+        return [binary](Stack& stack, const Args& args) -> double
         {
             double b = stack.top();
             stack.pop();

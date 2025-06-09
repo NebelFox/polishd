@@ -79,7 +79,7 @@ void REPL::evalSaved()
         std::cout << "No function with name '" << name << '\'' << std::endl;
         return;
     }
-    polishd::Function::Args args = parseArgs(tail).second;
+    polishd::Args args = parseArgs(tail).second;
     double result = lookup->second(args);
     std::cout << result << std::endl;
 }

@@ -10,15 +10,13 @@
 
 namespace polishd {
 
-    using Stack = std::stack<double>&;
-    using Args = const std::map<std::string, double>&;
-    using Unit = std::function<double (Stack, Args)>;
+    using Stack = std::stack<double>;
+    using Args = std::unordered_map<std::string, double>;
+    using Unit = std::function<double (Stack&, const Args&)>;
 
     class Function
     {
     public:
-        using Args = std::unordered_map<std::string, double>;
-        
         explicit Function(const std::list<Unit>& expression,
                           const std::string& infix,
                           const std::string& postfix);
