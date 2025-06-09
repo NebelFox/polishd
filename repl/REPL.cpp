@@ -167,3 +167,16 @@ void REPL::help()
     );
     std::cout << message;
 }
+
+std::pair<size_t, polishd::Args> REPL::parseArgs(const std::string& s)
+{
+    polishd::Args args;
+    auto iterator = std::sregex_iterator(s.begin(), s.end(), s_argsPattern);
+    auto end = std::sregex_iterator();
+    size_t start = std::string::npos;
+    if(iterator != end)
+        start = (*iterator).position(0);
+    for(; iterator != end; ++iterator)
+        args.insert_or_assign((*iterator)[1].str(), std::stod((*iterator)[2].str()));
+    return std::make_pair(start, args);
+}
