@@ -4,7 +4,7 @@
 #include "Token.hpp"
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <list>
 
 namespace polishd {
@@ -16,7 +16,7 @@ namespace polishd {
     class Function
     {
     public:
-        using Args = std::map<std::string, double>;
+        using Args = std::unordered_map<std::string, double>;
         
         explicit Function(const std::list<Unit>& expression,
                           const std::string& infix,
