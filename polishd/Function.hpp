@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <list>
+#include <functional>
 
 namespace polishd {
 
