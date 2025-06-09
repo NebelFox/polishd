@@ -99,6 +99,8 @@ std::string infix = f.infix(); // 1 + 1
 std::string postfix = f.postfix(); // 1 1 +
 ```
 
+> **Note**: *The infix() returns the original string that was parsed, so `compiler.compile("1   +1").infix()` would give `"1  +1"` instead of `"1 + 1"` or `"1+1"`.*
+
 ### Access (read-only) the Grammar entries
 
 ```c++
@@ -114,8 +116,6 @@ for(const auto& b: grammar.binaryOperators())
 for (const auto& pfx: grammar.postfixFunctions())
     printf("prefix function '%s'. `42.0%s` = %f", pfx.first, pfx.second(42.0));
 ```
-
-> **Note**: *The infix() returns the original string that was parsed, so `compiler.compile("1   +1").infix()` would give `"1  +1"` instead of `"1 + 1"` or `"1+1"`.*
 
 ## Semantics and Caveats
 
