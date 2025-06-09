@@ -1,8 +1,9 @@
-file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
-	"${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
-)
+cmake_minimum_required(VERSION 3.19)
+project(polishd LANGUAGES CXX)
 
-add_library(polishd Token.hpp Grammar.cpp Function.cpp Compiler.cpp)
+set(CMAKE_CXX_STANDARD 20)
+
+add_library(polishd STATIC Token.hpp Grammar.cpp Function.cpp Compiler.cpp)
 
 target_include_directories(polishd PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}
