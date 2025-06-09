@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <stack>
-#include <bitset>
 #include <sstream>
 
 namespace polishd {

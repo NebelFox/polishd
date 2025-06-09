@@ -9,8 +9,8 @@ namespace polishd {
     class Grammar
     {
     public:
-        typedef double (* Unary)(const double);
-        typedef double (* Binary)(const double, const double);
+        typedef double (* Unary)(double);
+        typedef double (* Binary)(double, double);
         
         using Precedence = unsigned char;
         

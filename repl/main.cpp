@@ -10,7 +10,7 @@ static void setupDemoGrammar(polishd::Grammar& grammar)
     grammar.addConstant("e", M_E);
 
     // prefix operators
-    #define UNARY(EXPR_ON_X) [](const double x) -> double { return EXPR_ON_X; }
+    #define UNARY(EXPR_ON_X) [](double x) -> double { return EXPR_ON_X; }
     grammar.addPrefixOperator("-", UNARY(-x));
     grammar.addPrefixOperator("exp", UNARY(std::exp(x)));
     grammar.addPrefixOperator("sin", UNARY(std::sin(x)));
@@ -21,7 +21,7 @@ static void setupDemoGrammar(polishd::Grammar& grammar)
     #undef UNARY
     
     // binary operators
-    #define BINARY(EXPR_ON_A_B) [](const double a, const double b) -> double { return EXPR_ON_A_B; }
+    #define BINARY(EXPR_ON_A_AND_B) [](double a, double b) -> double { return EXPR_ON_A_AND_B; }
     grammar.addBinaryOperator("+", BINARY(a+b), 1);
     grammar.addBinaryOperator("-", BINARY(a-b), 1);
     grammar.addBinaryOperator("*", BINARY(a*b), 2);
@@ -30,7 +30,7 @@ static void setupDemoGrammar(polishd::Grammar& grammar)
     #undef BINARY
 
     // postfix operators
-    grammar.addPostfixOperator("!", [](const double x) -> double
+    grammar.addPostfixOperator("!", [](double x) -> double
     {
         auto n = (size_t) x;
         size_t result = 1;
