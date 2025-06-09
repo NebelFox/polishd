@@ -5,7 +5,7 @@
 
 #include <string>
 #include <unordered_map>
-#include <list>
+#include <forward_list>
 #include <functional>
 
 namespace polishd {
@@ -13,11 +13,12 @@ namespace polishd {
     using Stack = std::stack<double>;
     using Args = std::unordered_map<std::string, double>;
     using Unit = std::function<double (Stack&, const Args&)>;
+    using UnitList = std::forward_list<Unit>;
 
     class Function
     {
     public:
-        explicit Function(const std::list<Unit>& expression,
+        explicit Function(const UnitList& expression,
                           const std::string& infix,
                           const std::string& postfix);
         
@@ -31,7 +32,7 @@ namespace polishd {
         const std::string& postfix() const;
 
     private:
-        std::list<Unit> m_expression;
+        UnitList m_expression;
         std::string m_infix;
         std::string m_postfix;
     };

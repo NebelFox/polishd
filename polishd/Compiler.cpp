@@ -15,131 +15,178 @@ namespace polishd {
         return m_grammar;
     }
 
-    Function Compiler::compile(const std::string& infix) const
+    Token Compiler::parseOperand(const std::string& infix, size_t start) const
     {
-        bool expectOperand = true;
-        std::list<Token> expression;
-        std::stack<Token> stack;
-
-        size_t length, i = 0;
-        while (infix[i] == ' ')
-            ++i;
-        while (i < infix.size())
-        {
-            if(expectOperand) {
-                if((length = Grammar::matchNumber(infix, i)))
-                {
-                    expression.push_back(Token{
-                            .type = TokenType::Number,
-                            .value = infix.substr(i, length)
-                    });
-                    expectOperand = false;
-                }
-                else if((length = m_grammar.matchPrefix(infix, i)))
-                {
-                    stack.push(Token{
-                            .type = TokenType::Prefix,
-                            .value = infix.substr(i, length)
-                    });
-                }
-                else if((length = infix[i] == '('))
-                {
-                    stack.push(Token{.type = TokenType::Opening});
-                }
-                else if((length = Grammar::matchArgument(infix, i)))
-                {
-                    expression.push_back(Token{
-                            .type = TokenType::Argument,
-                            .value = infix.substr(i, length)
-                    });
-                    expectOperand = false;
-                }
-                else
-                {
-                    throw std::logic_error("Expected a number, an argument, a prefix function or an opening parenthesis starting at " + infix.substr(i));
-                }
-            }
-            else
-            {
-                if((length = m_grammar.matchBinary(infix, i)))
-                {
-                    std::string signature = infix.substr(i, length);
-                    Grammar::Precedence p = m_grammar.precedenceOf(signature);
-                    while (!stack.empty()
-                        && (stack.top().type == TokenType::Prefix || m_grammar.precedenceOf(stack.top().value) > p))
-                    {
-                        expression.push_back(stack.top());
-                        stack.pop();
-                    }
-                    stack.push(Token{
-                            .type = TokenType::Binary,
-                            .value = signature
-                    });
-                    expectOperand = true;
-                }
-                else if ((length = m_grammar.matchPostfix(infix, i)))
-                {
-                    expression.push_back(Token{
-                            .type = TokenType::Postfix,
-                            .value = infix.substr(i, length)
-                    });
-                }
-                else if ((length = (infix[i] == ')')))
-                {
-                    while (stack.top().type != TokenType::Opening)
-                    {
-                        expression.push_back(stack.top());
-                        stack.pop();
-                    }
-                    stack.pop();
-                }
-                else
-                {
-                    throw std::logic_error("Expected a binary operator, a postfix function or a closing parenthesis starting at " + infix.substr(i));
-                }
-            }
-            i += length;
-            while (infix[i] == ' ')
-                ++i;
-        }
-        while (!stack.empty())
-        {
-            expression.push_back(stack.top());
-            stack.pop();
-        }
-
-        return Function(compile(expression),
-                        infix,
-                        stringify(expression));
+        auto type = TokenType::None;
+        size_t length;
+        if((length = Grammar::matchNumber(infix, start)))
+            type = TokenType::Number;
+        else if((length = m_grammar.matchPrefix(infix, start)))
+            type = TokenType::Prefix;
+        else if((length = infix[start] == '('))
+            type = TokenType::Opening;
+        else if((length = Grammar::matchArgument(infix, start)))
+            type = TokenType::Argument;
+        else
+            throw std::logic_error("Expected a number, an argument, a prefix function or an opening parenthesis starting at " + infix.substr(start));
+        
+        return Token{.type = type, .value = infix.substr(start, length)};
     }
 
-    std::list<Unit> Compiler::compile(const std::list<Token>& tokens) const
+    Token Compiler::parseOperator(const std::string& infix, size_t start) const
     {
-        std::list<Unit> expression;
-        for (const auto& token: tokens)
+        auto type = TokenType::None;
+        size_t length;
+        if((length = m_grammar.matchBinary(infix, start)))
+            type = TokenType::Binary;
+        else if ((length = m_grammar.matchPostfix(infix, start)))
+            type = TokenType::Postfix;
+        else if ((length = (infix[start] == ')')))
+            type = TokenType::Closing;
+        else
+            throw std::logic_error("Expected a binary operator, a postfix function or a closing parenthesis starting at " + infix.substr(start));
+
+        return Token{.type = type, .value = infix.substr(start, length)};
+    }
+
+    Compiler::TokenList Compiler::tokenize(const std::string& infix) const
+    {
+        size_t start = 0;
+        TokenList tokens;
+        auto last = tokens.before_begin();
+        bool expectOperand = true;
+
+        while (infix[start] == ' ')
+            ++start;
+        
+        while (start < infix.size())
         {
-            switch (token.type)
+            last = tokens.insert_after(last, 
+                expectOperand
+                ? parseOperand(infix, start)
+                : parseOperator(infix, start));
+            
+            start += last->value.size();
+            
+            if(last->type == TokenType::Number || last->type == TokenType::Argument)
+                expectOperand = false;
+            else if(last->type == TokenType::Binary)
+                expectOperand = true;
+
+            while (infix[start] == ' ')
+                ++start;
+        }
+        return tokens;
+    }
+
+    void Compiler::convertInfixToPostfix(TokenList& infix) const
+    {
+        std::stack<Token> stack;
+
+        auto prev = infix.before_begin();
+        auto it = infix.begin();
+        for(; it != infix.end();)
+        {
+            switch(it->type)
             {
-                case TokenType::Number:
-                    expression.push_back(CompileNumber(token));
-                    break;
-                case TokenType::Argument:
-                    expression.push_back(CompileArgument(token));
-                    break;
                 case TokenType::Prefix:
-                    expression.push_back(CompilePrefix(token));
+                case TokenType::Opening:
+                    // move from list to stack
+                    stack.push(std::move(*it));
+                    it = infix.erase_after(prev);
                     break;
+
                 case TokenType::Binary:
-                    expression.push_back(CompileBinary(token));
+                {
+                    // move from stack to list all prefix tokens 
+                    // and binary tokens with higher precedence than current;
+                    // then move current from list to stack
+                    Token binary(std::move(*it));
+                    it = infix.erase_after(prev);
+                    Grammar::Precedence p = m_grammar.precedenceOf(binary.value);
+                    while(!stack.empty() && (stack.top().type == TokenType::Prefix || m_grammar.precedenceOf(stack.top().value) > p))
+                    {
+                        prev = infix.insert_after(prev, stack.top());
+                        stack.pop();
+                    }
+                    it = prev;
+                    ++it;
+                    stack.push(std::move(binary));
                     break;
-                case TokenType::Postfix:
-                    expression.push_back(CompilePostfix(token));
+                }
+
+                case TokenType::Closing:
+                {
+                    it = infix.erase_after(prev);
+                    while(stack.top().type != TokenType::Opening)
+                    {
+                        prev = infix.insert_after(prev, std::move(stack.top()));
+                        stack.pop();
+                    }
+                    it = prev;
+                    ++it;
+                    stack.pop(); // pop Opening token from stack
                     break;
+                }
+
                 default:
-                    std::stringstream s;
-                    s << "Unhandled TokenType: " << static_cast<unsigned short>(token.type);
-                    throw std::logic_error(s.str());
+                    prev = it;
+                    ++it;
+                    break;
+
             }
+        }
+        while(!stack.empty())
+        {
+            prev = infix.insert_after(prev, stack.top());
+            stack.pop();
+        }
+    }
+
+    Function Compiler::compile(const std::string& infix) const
+    {
+        TokenList tokens = tokenize(infix);
+        convertInfixToPostfix(tokens);
+        return Function(
+            compile(tokens),
+            infix,
+            stringify(tokens)
+        );
+    }
+
+    Unit Compiler::compile(const Token& token) const
+    {
+        switch (token.type)
+        {
+            case TokenType::Number:
+                return CompileNumber(token);
+                break;
+            case TokenType::Argument:
+                return CompileArgument(token);
+                break;
+            case TokenType::Prefix:
+                return CompilePrefix(token);
+                break;
+            case TokenType::Binary:
+                return CompileBinary(token);
+                break;
+            case TokenType::Postfix:
+                return CompilePostfix(token);
+                break;
+            default:
+                std::stringstream s;
+                s << "Unhandled TokenType: " << static_cast<unsigned short>(token.type);
+                throw std::logic_error(s.str());
+        }
+    }
+
+    UnitList Compiler::compile(const TokenList& tokens) const
+    {
+        std::forward_list<Unit> expression;
+        auto it = expression.before_begin();
+        for (const Token& token: tokens)
+        {
+            it = expression.insert_after(it, compile(token));
         }
         return expression;
     }
@@ -200,7 +247,7 @@ namespace polishd {
         };
     }
 
-    std::string Compiler::stringify(const std::list<Token>& tokens)
+    std::string Compiler::stringify(const TokenList& tokens)
     {
         std::stringstream stream;
         for(const Token& token : tokens)
