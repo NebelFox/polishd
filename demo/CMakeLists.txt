@@ -3,10 +3,10 @@ project(demo)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(demo main.cpp REPL.cpp)
+add_executable(${PROJECT_NAME} main.cpp REPL.cpp)
 
-target_link_libraries(demo PRIVATE polishd)
+target_link_libraries(${PROJECT_NAME} PRIVATE polishd)
 
-target_include_directories(demo PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
 	${PROJECT_SOURCE_DIR}/polishd
 )
