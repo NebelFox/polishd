@@ -62,8 +62,8 @@ polishd::Grammar grammar;
 
 grammar.addConstant("g", 9.8);
 
-grammar.addPrefixFunction("-", [](double x) { return x; });
-grammar.addPrefixFunction("sin", std::sin);
+grammar.addPrefixOperator("-", [](double x) { return x; });
+grammar.addPrefixOperator("sin", std::sin);
 
 grammar.addBinaryOperator("+", [](double a, double b) { return a + b; }, 1);
 
@@ -107,14 +107,14 @@ std::string postfix = f.postfix(); // 1 1 +
 for (const auto& c: grammar.constants())
     printf("const %s = %f\n", c.first, c.second);
 
-for (const auto& prf: grammar.prefixFunctions())
-    printf("prefix function '%s'. `%s 42.0` = %f", prf.first, prf.second(42.0));
+for (const auto& prf: grammar.prefixOperators())
+    printf("prefix operator '%s'. `%s 42.0` = %f", prf.first, prf.second(42.0));
 
 for(const auto& b: grammar.binaryOperators())
     printf("binary operator '%s' with precedence %d. `2.5 %s 4.8` = %f", b.first, b.second.precedence, b.second.binary(2.5, 4.8));
 
-for (const auto& pfx: grammar.postfixFunctions())
-    printf("prefix function '%s'. `42.0%s` = %f", pfx.first, pfx.second(42.0));
+for (const auto& pfx: grammar.postfixOperators())
+    printf("postfix operator '%s'. `42.0%s` = %f", pfx.first, pfx.second(42.0));
 ```
 
 ## Semantics and Caveats
@@ -131,7 +131,7 @@ and is "hardcoded" in the compiled function to evaluate to the constant value.
 
 Currently, the names and signatures of entries within a `Grammar` are isolated by kind
 and are not cross-checked anyhow for duplicates,
-so you can have a constant `e` and a prefix function `e` at the same time.
+so you can have a constant `e` and a prefix operator `e` at the same time.
 
 The expected behavior in such a case is based on the parsing rules.
 
@@ -141,30 +141,30 @@ The expected behavior in such a case is based on the parsing rules.
 
 * **Number** - any floating point number that fits into `double` type. Consists of `-.0123456789` characters.
 * **Argument** - a non-empty string without whitespaces.
-* **Prefix Function** - an unary function that operates on the value to the right of it.
+* **Prefix Operator** - an unary function that operates on the value to the right of it.
 * **Binary Operator** - a binary function that operates on the two values adjacent to it.
   * **Binary Operator Precedence** - `0` meaning the lowest and `255` meaning the highest. Adjacent binary operators are executed in the descending order of their *precedence*. For example, given operator `+` with *precedence* `0` and operator `*` with *precedence* `1`, the expression `2+3*4` is equivalent to `2+(3*4)`.
-* **Postfix Function** - an unary function that operates on the value to the left of it.
+* **Postfix Operator** - an unary function that operates on the value to the left of it.
 * **Opening Parenthesis** `(` - marks the start of a sub-expression,
   i.e. a part of an expression that is evaluated in isolation from outer expression
   and is then treated as a single number by it. Sub-expressions could be nested.
 * **Closing Parenthesis** `)` - marks the end of the most-recently started sub-expression.
-* **Operand** - either a **Number**, an **Argument**, a **Prefix Function** or an **Opening Parenthesis**.
-* **Operator** - either a **Binary Operator**, a **Postfix Function** or a **Closing Parenthesis**.
+* **Operand** - either a **Number**, an **Argument**, a **Prefix Operator** or an **Opening Parenthesis**.
+* **Operator** - either a **Binary Operator**, a **Postfix Operator** or a **Closing Parenthesis**.
 
 ### Rules
 
 * An expression must start with an **Operand**.
-* A **Number**, an **Argument**, a **Closing Parenthesis** and a **Postfix Function** must be followed by an **Operator**.
-* A **Prefix Function**, a **Binary Operator** and a **Prefix Function** must be followed by an **Operand**.
+* A **Number**, an **Argument**, a **Closing Parenthesis** and a **Postfix Operator** must be followed by an **Operator**.
+* A **Prefix Operator**, a **Binary Operator** and an **Opening Parenthesis** must be followed by an **Operand**.
 * The **Operand** variants are attempted to be parsed in the following order:
    1. **Number**
-   2. **Prefix Function**
+   2. **Prefix Operator**
    3. **Opening Parenthesis**
    4. **Argument**
 * The **Operator** variants are attempted to be parsed in the following order:
   1. **Binary Operator**
-  2. **Postfix Function**
+  2. **Postfix Operator**
   3. **Closing Parenthesis**
 
-> **Note**: *Hence, given a prefix function with name `sin` and an argument with name `sin`, any `sin` in an expression would be treated as the **Prefix Function**, as they are parsed prior to **Argument**s.*
+> **Note**: *Hence, given a prefix operator with name `sin` and an argument with name `sin`, any `sin` in an expression would be treated as the **Prefix Operator**, as they are parsed prior to **Argument**s.*
