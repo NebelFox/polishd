@@ -10,16 +10,14 @@ static void setupDemoGrammar(polishd::Grammar& grammar)
     grammar.addConstant("e", M_E);
 
     // prefix operators
-    #define UNARY(EXPR_ON_X) [](double x) -> double { return EXPR_ON_X; }
-    grammar.addPrefixOperator("-", UNARY(-x));
-    grammar.addPrefixOperator("exp", UNARY(std::exp(x)));
-    grammar.addPrefixOperator("sin", UNARY(std::sin(x)));
-    grammar.addPrefixOperator("cos", UNARY(std::cos(x)));
-    grammar.addPrefixOperator("floor", UNARY(std::floor(x)));
-    grammar.addPrefixOperator("ceil", UNARY(std::ceil(x)));
-    grammar.addPrefixOperator("round", UNARY(std::round(x)));
-    grammar.addPrefixOperator("abs", UNARY(std::abs(x)));
-    #undef UNARY
+    grammar.addPrefixOperator("-", [](double x) -> double { return -x; });
+    grammar.addPrefixOperator("exp", std::exp);
+    grammar.addPrefixOperator("sin", std::sin);
+    grammar.addPrefixOperator("cos", std::cos);
+    grammar.addPrefixOperator("floor", std::floor);
+    grammar.addPrefixOperator("ceil", std::ceil);
+    grammar.addPrefixOperator("round", std::round);
+    grammar.addPrefixOperator("abs", std::abs);
     
     // binary operators
     #define BINARY(EXPR_ON_A_AND_B) [](double a, double b) -> double { return EXPR_ON_A_AND_B; }
