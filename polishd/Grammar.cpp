@@ -26,10 +26,10 @@ namespace polishd {
     {
         bool isSigned = (s[start] == '-' || s[start] == '+');
         size_t length = isSigned;
-        while (isdigit(s[start + length]))
+        while (length < s.size() && isdigit(s[start + length]))
             ++length;
-        length += s[start + length] == '.';
-        while (isdigit(s[start + length]))
+        length += length < s.size() && s[start + length] == '.';
+        while (length < s.size() && isdigit(s[start + length]))
             ++length;
         return length * (!isSigned || length > 1);
     }
@@ -37,7 +37,7 @@ namespace polishd {
     size_t Grammar::matchArgument(const std::string& s, const size_t start)
     {
         size_t length = 0;
-        while (isalpha(s[start + length]) || s[start + length] == '_')
+        while (length < s.size() && (isalpha(s[start + length]) || s[start + length] == '_'))
             ++length;
         return length;
     }
