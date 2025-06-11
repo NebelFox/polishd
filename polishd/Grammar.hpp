@@ -26,18 +26,18 @@ namespace polishd {
         [[nodiscard]] const std::unordered_map<std::string, BinaryOperator>& binary() const;
         [[nodiscard]] const std::unordered_map<std::string, Unary>& postfix() const;
 
-        static size_t matchNumber(const std::string& s, const size_t start);
-        static size_t matchArgument(const std::string& s, const size_t start);
+        static size_t matchNumber(const std::string& s, size_t start);
+        static size_t matchArgument(const std::string& s, size_t start);
 
-        size_t matchPrefix(const std::string& s, const size_t start) const;
-        size_t matchBinary(const std::string& s, const size_t start) const;
-        size_t matchPostfix(const std::string& s, const size_t start) const;
+        size_t matchPrefix(const std::string& s, size_t start) const;
+        size_t matchBinary(const std::string& s, size_t start) const;
+        size_t matchPostfix(const std::string& s, size_t start) const;
 
         Precedence precedenceOf(const std::string& signature) const;
 
-        void addConstant(const std::string& name, const double value);
+        void addConstant(const std::string& name, double value);
         void addPrefixOperator(const std::string& signature, Unary prefix);
-        void addBinaryOperator(const std::string& signature, Binary binary, const Precedence precedence);
+        void addBinaryOperator(const std::string& signature, Binary binary, Precedence precedence);
         void addPostfixOperator(const std::string& signature, Unary postfix);
 
     private:
@@ -47,12 +47,12 @@ namespace polishd {
         std::unordered_map<std::string, Unary> m_postfixOperators;
     private:
         template<typename Operator>
-        static size_t match(const std::string& s, const size_t start, const std::unordered_map<std::string, Operator>& ops);
+        static size_t match(const std::string& s, size_t start, const std::unordered_map<std::string, Operator>& ops);
     };
 
 
     template<typename Operator>
-    size_t Grammar::match(const std::string& s, const size_t start, const std::unordered_map<std::string, Operator>& ops)
+    size_t Grammar::match(const std::string& s, size_t start, const std::unordered_map<std::string, Operator>& ops)
     {
         for (const auto& pair: ops)
         {
