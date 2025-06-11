@@ -54,14 +54,10 @@ namespace polishd {
     template<typename Operator>
     size_t Grammar::match(const std::string& s, const size_t start, const std::unordered_map<std::string, Operator>& ops)
     {
-        size_t length;
         for (const auto& pair: ops)
         {
-            length = pair.first.length();
-            if (start + length <= s.length() && s.compare(start, length, pair.first) == 0)
-            {
-                return length;
-            }
+            if (s.compare(start, pair.first.length(), pair.first) == 0)
+                return pair.first.length();
         }
         return 0;
     }
