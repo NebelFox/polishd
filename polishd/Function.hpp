@@ -1,17 +1,19 @@
 #ifndef INC_POLISHD_FUNCTION_HPP
 #define INC_POLISHD_FUNCTION_HPP
 
-#include "Token.hpp"
-
 #include <string>
 #include <unordered_map>
 #include <forward_list>
 #include <functional>
+#include <stack>
+
+#include <TransparentStringKeyMap.hpp>
+#include "Token.hpp"
 
 namespace polishd {
 
     using Stack = std::stack<double>;
-    using Args = std::unordered_map<std::string, double>;
+    using Args = TransparentStringKeyMap<double>;
     using Unit = std::function<double (Stack&, const Args&)>;
     using UnitList = std::forward_list<Unit>;
 

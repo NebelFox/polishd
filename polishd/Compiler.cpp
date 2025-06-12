@@ -209,13 +209,13 @@ namespace polishd {
         }
         return [name=token.value](Stack& stack, const Args& args) -> double
         { 
-            return args.at(name);
+            return args.find(name)->second;
         };
     }
 
-    Unit Compiler::CompileUnary(const Token& token, const std::unordered_map<std::string, Grammar::Unary>& registry)
+    Unit Compiler::CompileUnary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry)
     {
-        const Grammar::Unary& unary = registry.at(token.value);
+        const Grammar::Unary& unary = registry.find(token.value)->second;
         return [unary](Stack& stack, const Args& args) -> double
         {
             double x = stack.top();
@@ -236,7 +236,7 @@ namespace polishd {
 
     Unit Compiler::CompileBinary(const Token& token) const
     {
-        const Grammar::Binary& binary = m_grammar.binary().at(token.value).binary;
+        const Grammar::Binary& binary = m_grammar.binary().find(token.value)->second.binary;
         return [binary](Stack& stack, const Args& args) -> double
         {
             double b = stack.top();

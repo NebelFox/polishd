@@ -5,9 +5,10 @@
 #include <forward_list>
 #include <unordered_map>
 
+#include "Token.hpp"
+#include <TransparentStringKeyMap.hpp>
 #include "Grammar.hpp"
 #include "Function.hpp"
-#include "Token.hpp"
 
 namespace polishd {
 
@@ -33,7 +34,7 @@ namespace polishd {
         Unit compile(const Token& token) const;
 
         static Unit CompileNumber(const Token& token);
-        static Unit CompileUnary(const Token& token, const std::unordered_map<std::string, Grammar::Unary>& registry);
+        static Unit CompileUnary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry);
         Unit CompileArgument(const Token& token) const;
         Unit CompilePrefix(const Token& token) const;
         Unit CompilePostfix(const Token& token) const;

@@ -2,7 +2,9 @@
 #define INC_POLISHD_GRAMMAR_HPP
 
 #include <string>
-#include <unordered_map>
+#include <string_view>
+
+#include <TransparentStringKeyMap.hpp>
 
 namespace polishd {
 
@@ -21,10 +23,10 @@ namespace polishd {
         };
 
     public:
-        [[nodiscard]] const std::unordered_map<std::string, double>& constants() const;
-        [[nodiscard]] const std::unordered_map<std::string, Unary>& prefix() const;
-        [[nodiscard]] const std::unordered_map<std::string, BinaryOperator>& binary() const;
-        [[nodiscard]] const std::unordered_map<std::string, Unary>& postfix() const;
+        [[nodiscard]] const TransparentStringKeyMap<double>& constants() const;
+        [[nodiscard]] const TransparentStringKeyMap<Unary>& prefix() const;
+        [[nodiscard]] const TransparentStringKeyMap<BinaryOperator>& binary() const;
+        [[nodiscard]] const TransparentStringKeyMap<Unary>& postfix() const;
 
         static size_t matchNumber(const std::string& s, size_t start);
         static size_t matchArgument(const std::string& s, size_t start);
@@ -41,18 +43,18 @@ namespace polishd {
         void addPostfixOperator(const std::string& signature, Unary postfix);
 
     private:
-        std::unordered_map<std::string, double> m_constants;
-        std::unordered_map<std::string, Unary> m_prefixOperators;
-        std::unordered_map<std::string, BinaryOperator> m_binaryOperators;
-        std::unordered_map<std::string, Unary> m_postfixOperators;
+        TransparentStringKeyMap<double> m_constants;
+        TransparentStringKeyMap<Unary> m_prefixOperators;
+        TransparentStringKeyMap<BinaryOperator> m_binaryOperators;
+        TransparentStringKeyMap<Unary> m_postfixOperators;
     private:
         template<typename Operator>
-        static size_t match(const std::string& s, size_t start, const std::unordered_map<std::string, Operator>& ops);
+        static size_t match(const std::string& s, size_t start, const TransparentStringKeyMap<Operator>& ops);
     };
 
 
     template<typename Operator>
-    size_t Grammar::match(const std::string& s, size_t start, const std::unordered_map<std::string, Operator>& ops)
+    size_t Grammar::match(const std::string& s, size_t start, const TransparentStringKeyMap<Operator>& ops)
     {
         for (const auto& pair: ops)
         {
