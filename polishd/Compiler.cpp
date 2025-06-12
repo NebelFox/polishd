@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stack>
 #include <sstream>
+#include <charconv>
 
 namespace polishd {
 
@@ -30,7 +31,7 @@ namespace polishd {
         else
             throw std::logic_error("Expected a number, an argument, a prefix function or an opening parenthesis starting at " + infix.substr(start));
         
-        return Token{.type = type, .value = infix.substr(start, length)};
+        return Token{.type = type, .value = std::string_view(infix).substr(start, length)};
     }
 
     Token Compiler::parseOperator(const std::string& infix, size_t start) const
@@ -46,7 +47,7 @@ namespace polishd {
         else
             throw std::logic_error("Expected a binary operator, a postfix function or a closing parenthesis starting at " + infix.substr(start));
 
-        return Token{.type = type, .value = infix.substr(start, length)};
+        return Token{.type = type, .value = std::string_view(infix).substr(start, length)};
     }
 
     Compiler::TokenList Compiler::tokenize(const std::string& infix) const
@@ -193,7 +194,8 @@ namespace polishd {
 
     Unit Compiler::CompileNumber(const Token& token)
     {
-        double x = stod(token.value);
+        double x;
+        std::from_chars(token.value.data(), token.value.data() + token.value.size(), x);
         return [x](Stack& stack, const Args& args) -> double
         { 
             return x;

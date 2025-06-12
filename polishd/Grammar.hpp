@@ -35,7 +35,7 @@ namespace polishd {
         size_t matchBinary(const std::string& s, size_t start) const;
         size_t matchPostfix(const std::string& s, size_t start) const;
 
-        Precedence precedenceOf(const std::string& signature) const;
+        Precedence precedenceOf(std::string_view signature) const;
 
         void addConstant(const std::string& name, double value);
         void addPrefixOperator(const std::string& signature, Unary prefix);

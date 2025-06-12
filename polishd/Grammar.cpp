@@ -57,7 +57,7 @@ namespace polishd {
         return match(s, start, m_postfixOperators);
     }
 
-    Grammar::Precedence Grammar::precedenceOf(const std::string& signature) const
+    Grammar::Precedence Grammar::precedenceOf(std::string_view signature) const
     {
         auto lookup = m_binaryOperators.find(signature);
         return (lookup != m_binaryOperators.end()) ? lookup->second.precedence : 0;

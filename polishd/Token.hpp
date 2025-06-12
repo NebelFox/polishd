@@ -1,10 +1,7 @@
 #ifndef INC_POLISHD_TOKEN_HPP
 #define INC_POLISHD_TOKEN_HPP
 
-#include <string>
-#include <stack>
-#include <functional>
-#include <map>
+#include <string_view>
 
 namespace polishd {
 
@@ -23,7 +20,7 @@ namespace polishd {
     struct Token
     {
         TokenType type;
-        std::string value {};
+        std::string_view value;
     };
 
 } // namespace polishd
