@@ -4,23 +4,37 @@
 #include <string>
 #include <unordered_map>
 #include <forward_list>
-#include <functional>
 #include <stack>
+#include <vector>
 
 #include <TransparentStringKeyMap.hpp>
 #include "Token.hpp"
+#include <Grammar.hpp>
 
 namespace polishd {
 
     using Stack = std::stack<double>;
     using Args = TransparentStringKeyMap<double>;
-    using Unit = std::function<double (Stack&, const Args&)>;
+    struct Unit {
+        // On x64
+        // The union takes 8 bytes
+        // But `TokenType` takes 1 byte
+        // So the whole Unit structure takes 16 bytes instead of 9 due to padding (multiples of 8)
+        TokenType type;
+        union {
+            double number;
+            Grammar::Unary unary;
+            Grammar::Binary binary;
+            size_t argIndex;
+        };
+    };
     using UnitList = std::forward_list<Unit>;
 
     class Function
     {
     public:
         explicit Function(const UnitList& expression,
+                          const TransparentStringKeyMap<size_t>& argIndices,
                           const std::string& infix,
                           const std::string& postfix);
         
@@ -35,6 +49,7 @@ namespace polishd {
 
     private:
         UnitList m_expression;
+        std::vector<std::string> m_argNames;
         std::string m_infix;
         std::string m_postfix;
     };

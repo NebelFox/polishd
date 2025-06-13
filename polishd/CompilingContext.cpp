@@ -139,18 +139,19 @@ namespace polishd {
         }
     }
 
-    Function CompilingContext::compile() const
+    Function CompilingContext::compile()
     {
         TokenList tokens = tokenize();
         convertInfixToPostfix(tokens);
         return Function(
             compile(tokens),
+            m_argIndices,
             m_infix,
             stringify(tokens)
         );
     }
 
-    Unit CompilingContext::compile(const Token& token) const
+    Unit CompilingContext::compile(const Token& token)
     {
         switch (token.type)
         {
@@ -176,11 +177,11 @@ namespace polishd {
         }
     }
 
-    UnitList CompilingContext::compile(const TokenList& tokens) const
+    UnitList CompilingContext::compile(const TokenList& postfix)
     {
         std::forward_list<Unit> expression;
         auto it = expression.before_begin();
-        for (const Token& token: tokens)
+        for (const Token& token: postfix)
         {
             it = expression.insert_after(it, compile(token));
         }
@@ -191,34 +192,26 @@ namespace polishd {
     {
         double x;
         std::from_chars(token.value.data(), token.value.data() + token.value.size(), x);
-        return [x](Stack& stack, const Args& args) -> double
-        { 
-            return x;
-        };
+        return {.type = token.type, .number = x};
     }
 
-    Unit CompilingContext::CompileArgument(const Token& token) const
+    Unit CompilingContext::CompileArgument(const Token& token)
     {
-        auto lookup = m_grammar.constants().find(token.value);
-        if(lookup != m_grammar.constants().end()) {
-            return [value=lookup->second](Stack& stack, const Args& args) -> double
-            { return value; };
+        if (const auto lookup = m_grammar.constants().find(token.value); lookup != m_grammar.constants().end()) {
+            return {.type = TokenType::Number, .number = lookup->second};
         }
-        return [name=token.value](Stack& stack, const Args& args) -> double
-        { 
-            return args.find(name)->second;
-        };
+        if (const auto argLookup = m_argIndices.find(token.value); argLookup != m_argIndices.end())
+        {
+            return {.type = token.type, .argIndex = argLookup->second};
+        }
+        m_argIndices[std::string(token.value)] = m_argIndices.size();
+        return {.type = token.type, .argIndex = m_argIndices.size()-1};
     }
 
     Unit CompilingContext::CompileUnary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry)
     {
-        const Grammar::Unary& unary = registry.find(token.value)->second;
-        return [unary](Stack& stack, const Args& args) -> double
-        {
-            double x = stack.top();
-            stack.pop();
-            return unary(x);
-        };
+        const Grammar::Unary unary = registry.find(token.value)->second;
+        return {.type = token.type, .unary = unary};
     }
 
     Unit CompilingContext::CompilePrefix(const Token& token) const
@@ -233,15 +226,8 @@ namespace polishd {
 
     Unit CompilingContext::CompileBinary(const Token& token) const
     {
-        const Grammar::Binary& binary = m_grammar.binary().find(token.value)->second.binary;
-        return [binary](Stack& stack, const Args& args) -> double
-        {
-            double b = stack.top();
-            stack.pop();
-            double a = stack.top();
-            stack.pop();
-            return binary(a, b);
-        };
+        const Grammar::Binary binary = m_grammar.binary().find(token.value)->second.binary;
+        return {.type = token.type, .binary = binary};
     }
 
     std::string CompilingContext::stringify(const TokenList& tokens)

@@ -4,9 +4,9 @@
 
 namespace polishd {
 
-    Function polishd::compile(const Grammar& grammar, const std::string& infix)
+    Function compile(const Grammar& grammar, const std::string& infix)
     {
         return CompilingContext(grammar, infix).compile();
     }
 
-}
+} // namespace polishd

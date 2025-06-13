@@ -17,7 +17,7 @@ namespace polishd {
     public:
         explicit CompilingContext(const Grammar& grammar, const std::string& infix);
         
-        Function compile() const;
+        Function compile();
 
     private:
         using TokenList = std::forward_list<Token>;
@@ -28,21 +28,21 @@ namespace polishd {
 
         void convertInfixToPostfix(TokenList& infix) const;
         
-        UnitList compile(const TokenList& postfix) const;
-        Unit compile(const Token& token) const;
+        UnitList compile(const TokenList& postfix);
+        Unit compile(const Token& token);
 
         static Unit CompileNumber(const Token& token);
         static Unit CompileUnary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry);
-        Unit CompileArgument(const Token& token) const;
+        Unit CompileArgument(const Token& token);
         Unit CompilePrefix(const Token& token) const;
         Unit CompilePostfix(const Token& token) const;
         Unit CompileBinary(const Token& token) const;
 
         static std::string stringify(const TokenList& tokens);
-
     private:
         const Grammar& m_grammar;
         const std::string& m_infix;
+        TransparentStringKeyMap<size_t> m_argIndices;
     };
 
 } // namespace polishd
