@@ -28,15 +28,15 @@ namespace polishd {
 
         size_t convert_infix_to_postfix(TokenList& infix) const;
         
-        Expression compile(const TokenList& postfix, size_t size);
-        Unit compile(const Token& token);
+        Function::Expression compile(const TokenList& postfix, size_t size);
+        Function::Unit compile(const Token& token);
 
-        static Unit compile_number(const Token& token);
-        static Unit compile_unary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry);
-        Unit compile_argument(const Token& token);
-        Unit compile_prefix(const Token& token) const;
-        Unit compile_postfix(const Token& token) const;
-        Unit compile_binary(const Token& token) const;
+        static Function::Unit compile_number(const Token& token);
+        static Function::Unit compile_unary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry);
+        Function::Unit compile_argument(const Token& token);
+        Function::Unit compile_prefix(const Token& token) const;
+        Function::Unit compile_postfix(const Token& token) const;
+        Function::Unit compile_binary(const Token& token) const;
 
         static std::string stringify(const TokenList& tokens);
     private:

@@ -13,33 +13,36 @@
 #include <Grammar.hpp>
 
 namespace polishd {
-
-    using Stack = std::stack<double>;
-    using Args = TransparentStringKeyMap<double>;
-    struct Unit {
-        // On x64
-        // The union takes 8 bytes
-        // But `TokenType` takes 1 byte
-        // So the whole Unit structure takes 16 bytes instead of 9 due to padding (multiples of 8)
-        TokenType type;
-        union {
-            double number;
-            Grammar::Unary unary;
-            Grammar::Binary binary;
-            size_t arg_index;
-        };
-    };
-    using UnitList = std::forward_list<Unit>;
-    using Expression = std::vector<Unit>;
-
+    
     class Function
     {
-    public:
+        friend class CompilingContext;
+
+    private:
+        using Stack = std::stack<double>;
+        using Args = TransparentStringKeyMap<double>;
+        struct Unit {
+            // On x64
+            // The union takes 8 bytes
+            // But `TokenType` takes 1 byte
+            // So the whole Unit structure takes 16 bytes instead of 9 due to padding (multiples of 8)
+            TokenType type;
+            union {
+                double number;
+                Grammar::Unary unary;
+                Grammar::Binary binary;
+                size_t arg_index;
+            };
+        };
+        using UnitList = std::forward_list<Unit>;
+        using Expression = std::vector<Unit>;
+    
         explicit Function(Expression expression,
-                          const std::unordered_map<std::string_view, size_t>& arg_indices,
-                          const std::string& infix,
-                          std::string postfix);
-        
+            const std::unordered_map<std::string_view, size_t>& arg_indices,
+            const std::string& infix,
+            std::string postfix);
+            
+    public:
         [[nodiscard]] double evaluate(const Args& args) const;
         [[nodiscard]] double evaluate() const;
 

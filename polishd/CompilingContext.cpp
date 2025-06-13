@@ -156,7 +156,7 @@ namespace polishd {
         );
     }
 
-    Unit CompilingContext::compile(const Token& token)
+    Function::Unit CompilingContext::compile(const Token& token)
     {
         switch (token.type)
         {
@@ -182,23 +182,23 @@ namespace polishd {
         }
     }
 
-    Expression CompilingContext::compile(const TokenList& postfix, size_t size)
+    Function::Expression CompilingContext::compile(const TokenList& postfix, size_t size)
     {
-        Expression expression;
+        Function::Expression expression;
         expression.reserve(size);
         for (const Token& token: postfix)
             expression.push_back(compile(token));
         return expression;
     }
 
-    Unit CompilingContext::compile_number(const Token& token)
+    Function::Unit CompilingContext::compile_number(const Token& token)
     {
         double x;
         std::from_chars(token.value.data(), token.value.data() + token.value.size(), x);
         return {.type = token.type, .number = x};
     }
 
-    Unit CompilingContext::compile_argument(const Token& token)
+    Function::Unit CompilingContext::compile_argument(const Token& token)
     {
         if (const auto const_lookup = m_grammar.constants().find(token.value); const_lookup != m_grammar.constants().end())
         {
@@ -212,23 +212,23 @@ namespace polishd {
         return {.type = token.type, .arg_index = m_arg_indices.size()-1};
     }
 
-    Unit CompilingContext::compile_unary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry)
+    Function::Unit CompilingContext::compile_unary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry)
     {
         const Grammar::Unary unary = registry.find(token.value)->second;
         return {.type = token.type, .unary = unary};
     }
 
-    Unit CompilingContext::compile_prefix(const Token& token) const
+    Function::Unit CompilingContext::compile_prefix(const Token& token) const
     {
         return compile_unary(token, m_grammar.prefix());
     }
 
-    Unit CompilingContext::compile_postfix(const Token& token) const
+    Function::Unit CompilingContext::compile_postfix(const Token& token) const
     {
         return compile_unary(token, m_grammar.postfix());
     }
 
-    Unit CompilingContext::compile_binary(const Token& token) const
+    Function::Unit CompilingContext::compile_binary(const Token& token) const
     {
         const Grammar::Binary binary = m_grammar.binary().find(token.value)->second.binary;
         return {.type = token.type, .binary = binary};
