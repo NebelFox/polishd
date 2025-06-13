@@ -26,9 +26,9 @@ namespace polishd {
         Token parse_operator(size_t start) const;
         TokenList tokenize() const;
 
-        void convert_infix_to_postfix(TokenList& infix) const;
+        size_t convert_infix_to_postfix(TokenList& infix) const;
         
-        UnitList compile(const TokenList& postfix);
+        Expression compile(const TokenList& postfix, size_t size);
         Unit compile(const Token& token);
 
         static Unit compile_number(const Token& token);

@@ -4,7 +4,7 @@
 
 namespace polishd {
 
-    Function::Function(UnitList expression,
+    Function::Function(Expression expression,
                        const std::unordered_map<std::string_view, size_t>& arg_indices,
                        const std::string& infix,
                        std::string postfix)

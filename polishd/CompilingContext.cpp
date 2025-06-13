@@ -75,10 +75,10 @@ namespace polishd {
         return tokens;
     }
 
-    void CompilingContext::convert_infix_to_postfix(TokenList& infix) const
+    size_t CompilingContext::convert_infix_to_postfix(TokenList& infix) const
     {
         std::stack<Token> stack;
-
+        size_t size = 0;
         auto prev = infix.before_begin();
         auto it = infix.begin();
         for(; it != infix.end();)
@@ -103,6 +103,7 @@ namespace polishd {
                     while(!stack.empty() && (stack.top().type == TokenType::Prefix || m_grammar.precedence_of(stack.top().value) > p))
                     {
                         prev = infix.insert_after(prev, stack.top());
+                        ++size;
                         stack.pop();
                     }
                     it = prev;
@@ -117,6 +118,7 @@ namespace polishd {
                     while(stack.top().type != TokenType::Opening)
                     {
                         prev = infix.insert_after(prev, std::move(stack.top()));
+                        ++size;
                         stack.pop();
                     }
                     it = prev;
@@ -128,6 +130,7 @@ namespace polishd {
                 default:
                     prev = it;
                     ++it;
+                    ++size;
                     break;
 
             }
@@ -135,16 +138,18 @@ namespace polishd {
         while(!stack.empty())
         {
             prev = infix.insert_after(prev, stack.top());
+            ++size;
             stack.pop();
         }
+        return size;
     }
 
     Function CompilingContext::compile()
     {
         TokenList tokens = tokenize();
-        convert_infix_to_postfix(tokens);
+        size_t size = convert_infix_to_postfix(tokens);
         return Function(
-            compile(tokens),
+            compile(tokens, size),
             m_arg_indices,
             m_infix,
             stringify(tokens)
@@ -177,14 +182,12 @@ namespace polishd {
         }
     }
 
-    UnitList CompilingContext::compile(const TokenList& postfix)
+    Expression CompilingContext::compile(const TokenList& postfix, size_t size)
     {
-        std::forward_list<Unit> expression;
-        auto it = expression.before_begin();
+        Expression expression;
+        expression.reserve(size);
         for (const Token& token: postfix)
-        {
-            it = expression.insert_after(it, compile(token));
-        }
+            expression.push_back(compile(token));
         return expression;
     }
 

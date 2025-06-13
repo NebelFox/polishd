@@ -30,11 +30,12 @@ namespace polishd {
         };
     };
     using UnitList = std::forward_list<Unit>;
+    using Expression = std::vector<Unit>;
 
     class Function
     {
     public:
-        explicit Function(UnitList expression,
+        explicit Function(Expression expression,
                           const std::unordered_map<std::string_view, size_t>& arg_indices,
                           const std::string& infix,
                           std::string postfix);
@@ -49,7 +50,7 @@ namespace polishd {
         const std::string& postfix() const;
 
     private:
-        UnitList m_expression;
+        Expression m_expression;
         std::vector<std::string_view> m_arg_names;
         std::string m_infix;
         std::string m_postfix;
