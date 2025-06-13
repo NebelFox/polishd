@@ -12,21 +12,19 @@
 
 namespace polishd {
 
-    class Compiler
+    class CompilingContext
     {
     public:
-        explicit Compiler(Grammar& grammar);
-
-        const Grammar& grammar() const;
+        explicit CompilingContext(const Grammar& grammar, const std::string& infix);
         
-        Function compile(const std::string& infix) const;
+        Function compile() const;
 
     private:
         using TokenList = std::forward_list<Token>;
 
-        Token parseOperand(const std::string& infix, size_t start) const;
-        Token parseOperator(const std::string& infix, size_t start) const;
-        TokenList tokenize(const std::string& infix) const;
+        Token parseOperand(size_t start) const;
+        Token parseOperator(size_t start) const;
+        TokenList tokenize() const;
 
         void convertInfixToPostfix(TokenList& infix) const;
         
@@ -43,7 +41,8 @@ namespace polishd {
         static std::string stringify(const TokenList& tokens);
 
     private:
-        Grammar m_grammar;
+        const Grammar& m_grammar;
+        const std::string& m_infix;
     };
 
 } // namespace polishd

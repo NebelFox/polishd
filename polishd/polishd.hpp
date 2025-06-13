@@ -3,6 +3,6 @@
 
 #include <Grammar.hpp>
 #include <Function.hpp>
-#include <Compiler.hpp>
+#include <compile.hpp>
 
 #endif // INC_POLISHD_POLISHD_HPP

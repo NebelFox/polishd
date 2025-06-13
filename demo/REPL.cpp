@@ -5,7 +5,7 @@
 
 const std::regex REPL::s_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)");
 
-REPL::REPL(polishd::Grammar& grammar) : m_compiler(grammar)
+REPL::REPL(polishd::Grammar& grammar) : m_grammar(grammar)
 {
     #define BIND(METHOD) std::bind(&REPL::METHOD, this);
     m_commands["save"] = BIND(save);
@@ -54,7 +54,7 @@ void REPL::save()
     std::cin >> name >> std::ws;
     std::string expression;
     std::getline(std::cin, expression);
-    m_functions.insert_or_assign(name, m_compiler.compile(expression));
+    m_functions.insert_or_assign(name, polishd::compile(m_grammar, expression));
 }
 
 void REPL::eval()
@@ -62,7 +62,7 @@ void REPL::eval()
     std::string tail;
     std::getline(std::cin >> std::ws, tail);
     auto [start, args] = parseArgs(tail);
-    polishd::Function f = m_compiler.compile(tail.substr(0, start));
+    polishd::Function f = polishd::compile(m_grammar, tail.substr(0, start));
     double result = f(args);
     std::cout << result << std::endl;
 }
@@ -119,18 +119,17 @@ void REPL::clear()
 
 void REPL::showGrammar()
 {
-    const polishd::Grammar& grammar = m_compiler.grammar();
     std::cout << "Constants: ";
-    for (const auto& pair: grammar.constants())
+    for (const auto& pair: m_grammar.constants())
         std::cout << pair.first << '=' << pair.second << ", ";
     std::cout << std::endl << "Prefix Functions: ";
-    for (const auto& pair: grammar.prefix())
+    for (const auto& pair: m_grammar.prefix())
         std::cout << pair.first << ", ";
     std::cout << std::endl << "Binary Operations (precedence): ";
-    for (const auto& pair: grammar.binary())
+    for (const auto& pair: m_grammar.binary())
         std::cout << pair.first << '(' << (short) pair.second.precedence << "), ";
     std::cout << std::endl << "Postfix Functions: ";
-    for (const auto& pair: grammar.postfix())
+    for (const auto& pair: m_grammar.postfix())
         std::cout << pair.first << ", ";
     std::cout << std::endl;
 }

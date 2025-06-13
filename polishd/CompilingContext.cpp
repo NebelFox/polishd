@@ -1,4 +1,4 @@
-#include "Compiler.hpp"
+#include "CompilingContext.hpp"
 
 #include <iostream>
 #include <stack>
@@ -7,65 +7,60 @@
 
 namespace polishd {
 
-    Compiler::Compiler(Grammar& grammar) : m_grammar(grammar) 
+    CompilingContext::CompilingContext(const Grammar& grammar, const std::string& infix) : m_grammar(grammar), m_infix(infix) 
     {
     }
 
-    const Grammar& Compiler::grammar() const
-    {
-        return m_grammar;
-    }
-
-    Token Compiler::parseOperand(const std::string& infix, size_t start) const
+    Token CompilingContext::parseOperand(size_t start) const
     {
         auto type = TokenType::None;
         size_t length;
-        if((length = Grammar::matchNumber(infix, start)))
+        if((length = Grammar::matchNumber(m_infix, start)))
             type = TokenType::Number;
-        else if((length = m_grammar.matchPrefix(infix, start)))
+        else if((length = m_grammar.matchPrefix(m_infix, start)))
             type = TokenType::Prefix;
-        else if((length = infix[start] == '('))
+        else if((length = m_infix[start] == '('))
             type = TokenType::Opening;
-        else if((length = Grammar::matchArgument(infix, start)))
+        else if((length = Grammar::matchArgument(m_infix, start)))
             type = TokenType::Argument;
         else
-            throw std::logic_error("Expected a number, an argument, a prefix function or an opening parenthesis starting at " + infix.substr(start));
+            throw std::logic_error("Expected a number, an argument, a prefix function or an opening parenthesis starting at " + m_infix.substr(start));
         
-        return Token{.type = type, .value = std::string_view(infix).substr(start, length)};
+        return Token{.type = type, .value = std::string_view(m_infix).substr(start, length)};
     }
 
-    Token Compiler::parseOperator(const std::string& infix, size_t start) const
+    Token CompilingContext::parseOperator(size_t start) const
     {
         auto type = TokenType::None;
         size_t length;
-        if((length = m_grammar.matchBinary(infix, start)))
+        if((length = m_grammar.matchBinary(m_infix, start)))
             type = TokenType::Binary;
-        else if ((length = m_grammar.matchPostfix(infix, start)))
+        else if ((length = m_grammar.matchPostfix(m_infix, start)))
             type = TokenType::Postfix;
-        else if ((length = (infix[start] == ')')))
+        else if ((length = (m_infix[start] == ')')))
             type = TokenType::Closing;
         else
-            throw std::logic_error("Expected a binary operator, a postfix function or a closing parenthesis starting at " + infix.substr(start));
+            throw std::logic_error("Expected a binary operator, a postfix function or a closing parenthesis starting at " + m_infix.substr(start));
 
-        return Token{.type = type, .value = std::string_view(infix).substr(start, length)};
+        return Token{.type = type, .value = std::string_view(m_infix).substr(start, length)};
     }
 
-    Compiler::TokenList Compiler::tokenize(const std::string& infix) const
+    CompilingContext::TokenList CompilingContext::tokenize() const
     {
         size_t start = 0;
         TokenList tokens;
         auto last = tokens.before_begin();
         bool expectOperand = true;
 
-        while (infix[start] == ' ')
+        while (m_infix[start] == ' ')
             ++start;
         
-        while (start < infix.size())
+        while (start < m_infix.size())
         {
             last = tokens.insert_after(last, 
                 expectOperand
-                ? parseOperand(infix, start)
-                : parseOperator(infix, start));
+                ? parseOperand(start)
+                : parseOperator(start));
             
             start += last->value.size();
             
@@ -74,13 +69,13 @@ namespace polishd {
             else if(last->type == TokenType::Binary)
                 expectOperand = true;
 
-            while (infix[start] == ' ')
+            while (m_infix[start] == ' ')
                 ++start;
         }
         return tokens;
     }
 
-    void Compiler::convertInfixToPostfix(TokenList& infix) const
+    void CompilingContext::convertInfixToPostfix(TokenList& infix) const
     {
         std::stack<Token> stack;
 
@@ -144,18 +139,18 @@ namespace polishd {
         }
     }
 
-    Function Compiler::compile(const std::string& infix) const
+    Function CompilingContext::compile() const
     {
-        TokenList tokens = tokenize(infix);
+        TokenList tokens = tokenize();
         convertInfixToPostfix(tokens);
         return Function(
             compile(tokens),
-            infix,
+            m_infix,
             stringify(tokens)
         );
     }
 
-    Unit Compiler::compile(const Token& token) const
+    Unit CompilingContext::compile(const Token& token) const
     {
         switch (token.type)
         {
@@ -181,7 +176,7 @@ namespace polishd {
         }
     }
 
-    UnitList Compiler::compile(const TokenList& tokens) const
+    UnitList CompilingContext::compile(const TokenList& tokens) const
     {
         std::forward_list<Unit> expression;
         auto it = expression.before_begin();
@@ -192,7 +187,7 @@ namespace polishd {
         return expression;
     }
 
-    Unit Compiler::CompileNumber(const Token& token)
+    Unit CompilingContext::CompileNumber(const Token& token)
     {
         double x;
         std::from_chars(token.value.data(), token.value.data() + token.value.size(), x);
@@ -202,7 +197,7 @@ namespace polishd {
         };
     }
 
-    Unit Compiler::CompileArgument(const Token& token) const
+    Unit CompilingContext::CompileArgument(const Token& token) const
     {
         auto lookup = m_grammar.constants().find(token.value);
         if(lookup != m_grammar.constants().end()) {
@@ -215,7 +210,7 @@ namespace polishd {
         };
     }
 
-    Unit Compiler::CompileUnary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry)
+    Unit CompilingContext::CompileUnary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry)
     {
         const Grammar::Unary& unary = registry.find(token.value)->second;
         return [unary](Stack& stack, const Args& args) -> double
@@ -226,17 +221,17 @@ namespace polishd {
         };
     }
 
-    Unit Compiler::CompilePrefix(const Token& token) const
+    Unit CompilingContext::CompilePrefix(const Token& token) const
     {
         return CompileUnary(token, m_grammar.prefix());
     }
 
-    Unit Compiler::CompilePostfix(const Token& token) const
+    Unit CompilingContext::CompilePostfix(const Token& token) const
     {
         return CompileUnary(token, m_grammar.postfix());
     }
 
-    Unit Compiler::CompileBinary(const Token& token) const
+    Unit CompilingContext::CompileBinary(const Token& token) const
     {
         const Grammar::Binary& binary = m_grammar.binary().find(token.value)->second.binary;
         return [binary](Stack& stack, const Args& args) -> double
@@ -249,7 +244,7 @@ namespace polishd {
         };
     }
 
-    std::string Compiler::stringify(const TokenList& tokens)
+    std::string CompilingContext::stringify(const TokenList& tokens)
     {
         std::stringstream stream;
         for(const Token& token : tokens)

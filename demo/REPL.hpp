@@ -29,7 +29,7 @@ public:
 private:
     static std::pair<size_t, polishd::Args> parseArgs(const std::string& s); 
 private:
-    polishd::Compiler m_compiler;
+    const polishd::Grammar& m_grammar;
     std::unordered_map<std::string, polishd::Function> m_functions;
     std::unordered_map<std::string, std::function<void()>> m_commands;
     static const std::regex s_argsPattern;
