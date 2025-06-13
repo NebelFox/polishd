@@ -5,33 +5,33 @@
 namespace polishd {
 
     Function::Function(UnitList expression,
-                       const std::unordered_map<std::string_view, size_t>& argIndices,
+                       const std::unordered_map<std::string_view, size_t>& arg_indices,
                        const std::string& infix,
                        std::string postfix)
         : m_expression(std::move(expression)),
-          m_argNames(argIndices.size()),
+          m_arg_names(arg_indices.size()),
           m_infix(infix),
           m_postfix(std::move(postfix))
     {
-        for(const auto& [argName, index] : argIndices)
+        for(const auto& [arg_name, index] : arg_indices)
         {
             // translate arg name string_views to point to m_infix
-            const size_t start = argName.data() - infix.data();
-            m_argNames[index] = std::string_view(m_infix).substr(start, argName.size());
+            const size_t start = arg_name.data() - infix.data();
+            m_arg_names[index] = std::string_view(m_infix).substr(start, arg_name.size());
         }
     }
 
     double Function::evaluate(const Args& args) const
     {
         // prepare argument values
-        std::vector<double> argValues;
-        argValues.reserve(m_argNames.size());
-        for(size_t i=0; i<m_argNames.size(); ++i)
+        std::vector<double> arg_values;
+        arg_values.reserve(m_arg_names.size());
+        for(size_t i=0; i<m_arg_names.size(); ++i)
         {
-            auto lookup = args.find(m_argNames[i]);
+            auto lookup = args.find(m_arg_names[i]);
             if(lookup == args.end())
-                throw "Missing argument " + std::string(m_argNames[i]);
-            argValues.push_back(lookup->second);
+                throw "Missing argument " + std::string(m_arg_names[i]);
+            arg_values.push_back(lookup->second);
         }
         // evaluate
         Stack stack;
@@ -57,7 +57,7 @@ namespace polishd {
                     stack.push(unit.binary(a, b));
                     break;
                 case TokenType::Argument:
-                    stack.push(argValues[unit.argIndex]);
+                    stack.push(arg_values[unit.arg_index]);
                     break;
                 default:
                     throw "Unexpected token type";

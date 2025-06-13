@@ -28,25 +28,25 @@ namespace polishd {
         [[nodiscard]] const TransparentStringKeyMap<BinaryOperator>& binary() const;
         [[nodiscard]] const TransparentStringKeyMap<Unary>& postfix() const;
 
-        static size_t matchNumber(const std::string& s, size_t start);
-        static size_t matchArgument(const std::string& s, size_t start);
+        static size_t match_number(const std::string& s, size_t start);
+        static size_t match_argument(const std::string& s, size_t start);
 
-        size_t matchPrefix(const std::string& s, size_t start) const;
-        size_t matchBinary(const std::string& s, size_t start) const;
-        size_t matchPostfix(const std::string& s, size_t start) const;
+        size_t match_prefix(const std::string& s, size_t start) const;
+        size_t match_binary(const std::string& s, size_t start) const;
+        size_t match_postfix(const std::string& s, size_t start) const;
 
-        Precedence precedenceOf(std::string_view signature) const;
+        Precedence precedence_of(std::string_view signature) const;
 
-        void addConstant(const std::string& name, double value);
-        void addPrefixOperator(const std::string& signature, Unary prefix);
-        void addBinaryOperator(const std::string& signature, Binary binary, Precedence precedence);
-        void addPostfixOperator(const std::string& signature, Unary postfix);
+        void add_constant(const std::string& name, double value);
+        void add_prefix_operator(const std::string& signature, Unary prefix);
+        void add_binary_operator(const std::string& signature, Binary binary, Precedence precedence);
+        void add_postfix_operator(const std::string& signature, Unary postfix);
 
     private:
         TransparentStringKeyMap<double> m_constants;
-        TransparentStringKeyMap<Unary> m_prefixOperators;
-        TransparentStringKeyMap<BinaryOperator> m_binaryOperators;
-        TransparentStringKeyMap<Unary> m_postfixOperators;
+        TransparentStringKeyMap<Unary> m_prefix_operators;
+        TransparentStringKeyMap<BinaryOperator> m_binary_operators;
+        TransparentStringKeyMap<Unary> m_postfix_operators;
     private:
         template<typename Operator>
         static size_t match(const std::string& s, size_t start, const TransparentStringKeyMap<Operator>& ops);

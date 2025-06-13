@@ -26,7 +26,7 @@ namespace polishd {
             double number;
             Grammar::Unary unary;
             Grammar::Binary binary;
-            size_t argIndex;
+            size_t arg_index;
         };
     };
     using UnitList = std::forward_list<Unit>;
@@ -35,7 +35,7 @@ namespace polishd {
     {
     public:
         explicit Function(UnitList expression,
-                          const std::unordered_map<std::string_view, size_t>& argIndices,
+                          const std::unordered_map<std::string_view, size_t>& arg_indices,
                           const std::string& infix,
                           std::string postfix);
         
@@ -50,7 +50,7 @@ namespace polishd {
 
     private:
         UnitList m_expression;
-        std::vector<std::string_view> m_argNames;
+        std::vector<std::string_view> m_arg_names;
         std::string m_infix;
         std::string m_postfix;
     };

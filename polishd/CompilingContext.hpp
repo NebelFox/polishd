@@ -22,27 +22,27 @@ namespace polishd {
     private:
         using TokenList = std::forward_list<Token>;
 
-        Token parseOperand(size_t start) const;
-        Token parseOperator(size_t start) const;
+        Token parse_operand(size_t start) const;
+        Token parse_operator(size_t start) const;
         TokenList tokenize() const;
 
-        void convertInfixToPostfix(TokenList& infix) const;
+        void convert_infix_to_postfix(TokenList& infix) const;
         
         UnitList compile(const TokenList& postfix);
         Unit compile(const Token& token);
 
-        static Unit CompileNumber(const Token& token);
-        static Unit CompileUnary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry);
-        Unit CompileArgument(const Token& token);
-        Unit CompilePrefix(const Token& token) const;
-        Unit CompilePostfix(const Token& token) const;
-        Unit CompileBinary(const Token& token) const;
+        static Unit compile_number(const Token& token);
+        static Unit compile_unary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry);
+        Unit compile_argument(const Token& token);
+        Unit compile_prefix(const Token& token) const;
+        Unit compile_postfix(const Token& token) const;
+        Unit compile_binary(const Token& token) const;
 
         static std::string stringify(const TokenList& tokens);
     private:
         const Grammar& m_grammar;
         const std::string& m_infix;
-        std::unordered_map<std::string_view, size_t> m_argIndices;
+        std::unordered_map<std::string_view, size_t> m_arg_indices;
     };
 
 } // namespace polishd

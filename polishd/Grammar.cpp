@@ -9,32 +9,32 @@ namespace polishd {
 
     const TransparentStringKeyMap<Grammar::Unary>& Grammar::prefix() const
     {
-        return m_prefixOperators;
+        return m_prefix_operators;
     }
 
     const TransparentStringKeyMap<Grammar::BinaryOperator>& Grammar::binary() const
     {
-        return m_binaryOperators;
+        return m_binary_operators;
     }
 
     const TransparentStringKeyMap<Grammar::Unary>& Grammar::postfix() const
     {
-        return m_postfixOperators;
+        return m_postfix_operators;
     }
 
-    size_t Grammar::matchNumber(const std::string& s, size_t start)
+    size_t Grammar::match_number(const std::string& s, size_t start)
     {
-        bool isSigned = (s[start] == '-' || s[start] == '+');
-        size_t length = isSigned;
+        bool is_signed = (s[start] == '-' || s[start] == '+');
+        size_t length = is_signed;
         while (length < s.size() && isdigit(s[start + length]))
             ++length;
         length += length < s.size() && s[start + length] == '.';
         while (length < s.size() && isdigit(s[start + length]))
             ++length;
-        return length * (!isSigned || length > 1);
+        return length * (!is_signed || length > 1);
     }
 
-    size_t Grammar::matchArgument(const std::string& s, size_t start)
+    size_t Grammar::match_argument(const std::string& s, size_t start)
     {
         size_t length = 0;
         while (length < s.size() && (isalpha(s[start + length]) || s[start + length] == '_'))
@@ -42,45 +42,45 @@ namespace polishd {
         return length;
     }
 
-    size_t Grammar::matchPrefix(const std::string& s, size_t start) const
+    size_t Grammar::match_prefix(const std::string& s, size_t start) const
     {
-        return match(s, start, m_prefixOperators);
+        return match(s, start, m_prefix_operators);
     }
 
-    size_t Grammar::matchBinary(const std::string& s, size_t start) const
+    size_t Grammar::match_binary(const std::string& s, size_t start) const
     {
-        return match(s, start, m_binaryOperators);
+        return match(s, start, m_binary_operators);
     }
 
-    size_t Grammar::matchPostfix(const std::string& s, size_t start) const
+    size_t Grammar::match_postfix(const std::string& s, size_t start) const
     {
-        return match(s, start, m_postfixOperators);
+        return match(s, start, m_postfix_operators);
     }
 
-    Grammar::Precedence Grammar::precedenceOf(std::string_view signature) const
+    Grammar::Precedence Grammar::precedence_of(std::string_view signature) const
     {
-        auto lookup = m_binaryOperators.find(signature);
-        return (lookup != m_binaryOperators.end()) ? lookup->second.precedence : 0;
+        auto lookup = m_binary_operators.find(signature);
+        return (lookup != m_binary_operators.end()) ? lookup->second.precedence : 0;
     }
 
-    void Grammar::addConstant(const std::string& name, double value)
+    void Grammar::add_constant(const std::string& name, double value)
     {
         m_constants.insert_or_assign(name, value);
     }
 
-    void Grammar::addPrefixOperator(const std::string& signature, Unary prefix)
+    void Grammar::add_prefix_operator(const std::string& signature, Unary prefix)
     {
-        m_prefixOperators.insert_or_assign(signature, prefix);
+        m_prefix_operators.insert_or_assign(signature, prefix);
     }
 
-    void Grammar::addBinaryOperator(const std::string& signature, Binary binary, Precedence precedence)
+    void Grammar::add_binary_operator(const std::string& signature, Binary binary, Precedence precedence)
     {
-        m_binaryOperators.insert_or_assign(signature, BinaryOperator {binary, precedence});
+        m_binary_operators.insert_or_assign(signature, BinaryOperator {binary, precedence});
     }
 
-    void Grammar::addPostfixOperator(const std::string& signature, Unary postfix)
+    void Grammar::add_postfix_operator(const std::string& signature, Unary postfix)
     {
-        m_postfixOperators.insert_or_assign(signature, postfix);
+        m_postfix_operators.insert_or_assign(signature, postfix);
     }
 
 } // namespace polishd

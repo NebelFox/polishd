@@ -14,13 +14,13 @@ namespace polishd {
         using Ts::operator() ...;
     };
     
-    using transparentStringHash = overload<
+    using transparent_string_hash = overload<
         std::hash<std::string>,
         std::hash<std::string_view>
     >;
 
     template<typename ValueType>
-    using TransparentStringKeyMap = std::unordered_map<std::string, ValueType, transparentStringHash, std::equal_to<>>;
+    using TransparentStringKeyMap = std::unordered_map<std::string, ValueType, transparent_string_hash, std::equal_to<>>;
 
 } // namespace polishd
 
