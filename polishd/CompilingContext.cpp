@@ -204,7 +204,7 @@ namespace polishd {
         {
             return {.type = token.type, .argIndex = argLookup->second};
         }
-        m_argIndices[std::string(token.value)] = m_argIndices.size();
+        m_argIndices[token.value] = m_argIndices.size();
         return {.type = token.type, .argIndex = m_argIndices.size()-1};
     }
 

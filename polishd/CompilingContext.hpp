@@ -2,11 +2,11 @@
 #define INC_POLISHD_COMPILER_HPP
 
 #include <string>
+#include <string_view>
 #include <forward_list>
 #include <unordered_map>
 
 #include "Token.hpp"
-#include <TransparentStringKeyMap.hpp>
 #include "Grammar.hpp"
 #include "Function.hpp"
 
@@ -42,7 +42,7 @@ namespace polishd {
     private:
         const Grammar& m_grammar;
         const std::string& m_infix;
-        TransparentStringKeyMap<size_t> m_argIndices;
+        std::unordered_map<std::string_view, size_t> m_argIndices;
     };
 
 } // namespace polishd

@@ -1,15 +1,24 @@
 #include "Function.hpp"
 
+#include <iostream>
+
 namespace polishd {
 
-    Function::Function(const UnitList&  expression,
-                       const TransparentStringKeyMap<size_t>& argIndices,
+    Function::Function(UnitList expression,
+                       const std::unordered_map<std::string_view, size_t>& argIndices,
                        const std::string& infix,
-                       const std::string& postfix) : m_expression(expression), m_argNames(argIndices.size()), m_infix(infix), m_postfix(postfix)
+                       std::string postfix)
+        : m_expression(std::move(expression)),
+          m_argNames(argIndices.size()),
+          m_infix(infix),
+          m_postfix(std::move(postfix))
     {
-        // m_argNames.reserve(argIndices.size());
         for(const auto& [argName, index] : argIndices)
-            m_argNames[index] = argName;
+        {
+            // translate arg name string_views to point to m_infix
+            const size_t start = argName.data() - infix.data();
+            m_argNames[index] = std::string_view(m_infix).substr(start, argName.size());
+        }
     }
 
     double Function::evaluate(const Args& args) const
@@ -21,7 +30,7 @@ namespace polishd {
         {
             auto lookup = args.find(m_argNames[i]);
             if(lookup == args.end())
-                throw "Missing argument " + m_argNames[i];
+                throw "Missing argument " + std::string(m_argNames[i]);
             argValues.push_back(lookup->second);
         }
         // evaluate

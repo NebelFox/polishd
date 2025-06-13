@@ -2,6 +2,7 @@
 #define INC_POLISHD_FUNCTION_HPP
 
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <forward_list>
 #include <stack>
@@ -33,10 +34,10 @@ namespace polishd {
     class Function
     {
     public:
-        explicit Function(const UnitList& expression,
-                          const TransparentStringKeyMap<size_t>& argIndices,
+        explicit Function(UnitList expression,
+                          const std::unordered_map<std::string_view, size_t>& argIndices,
                           const std::string& infix,
-                          const std::string& postfix);
+                          std::string postfix);
         
         [[nodiscard]] double evaluate(const Args& args) const;
         [[nodiscard]] double evaluate() const;
@@ -49,7 +50,7 @@ namespace polishd {
 
     private:
         UnitList m_expression;
-        std::vector<std::string> m_argNames;
+        std::vector<std::string_view> m_argNames;
         std::string m_infix;
         std::string m_postfix;
     };
