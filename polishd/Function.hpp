@@ -14,13 +14,25 @@
 
 namespace polishd {
     
+    using Args = TransparentStringKeyMap<double>;
+    
     class Function
     {
         friend class CompilingContext;
 
+    public:
+
+        [[nodiscard]] double evaluate(const Args& args) const;
+        [[nodiscard]] double evaluate() const;
+    
+        double operator()(const Args& args) const;
+        double operator()() const;
+    
+        const std::string& infix() const;
+        const std::string& postfix() const;
+
     private:
         using Stack = std::stack<double>;
-        using Args = TransparentStringKeyMap<double>;
         struct Unit {
             // On x64
             // The union takes 8 bytes
@@ -38,20 +50,9 @@ namespace polishd {
         using Expression = std::vector<Unit>;
     
         explicit Function(Expression expression,
-            const std::unordered_map<std::string_view, size_t>& arg_indices,
-            const std::string& infix,
-            std::string postfix);
-            
-    public:
-        [[nodiscard]] double evaluate(const Args& args) const;
-        [[nodiscard]] double evaluate() const;
-
-        double operator()(const Args& args) const;
-        double operator()() const;
-
-        const std::string& infix() const;
-        const std::string& postfix() const;
-
+                          const std::unordered_map<std::string_view, size_t>& arg_indices,
+                          const std::string& infix,
+                          std::string postfix);
     private:
         Expression m_expression;
         std::vector<std::string_view> m_arg_names;

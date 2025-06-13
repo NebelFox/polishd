@@ -10,6 +10,8 @@ namespace polishd {
 
     class Grammar
     {
+        friend class CompilingContext;
+
     public:
         typedef double (* Unary)(double);
         typedef double (* Binary)(double, double);
@@ -27,7 +29,13 @@ namespace polishd {
         [[nodiscard]] const TransparentStringKeyMap<Unary>& prefix() const;
         [[nodiscard]] const TransparentStringKeyMap<BinaryOperator>& binary() const;
         [[nodiscard]] const TransparentStringKeyMap<Unary>& postfix() const;
-
+        
+        void add_constant(const std::string& name, double value);
+        void add_prefix_operator(const std::string& signature, Unary prefix);
+        void add_binary_operator(const std::string& signature, Binary binary, Precedence precedence);
+        void add_postfix_operator(const std::string& signature, Unary postfix);
+        
+    private:
         static size_t match_number(const std::string& s, size_t start);
         static size_t match_argument(const std::string& s, size_t start);
 
@@ -36,20 +44,14 @@ namespace polishd {
         size_t match_postfix(const std::string& s, size_t start) const;
 
         Precedence precedence_of(std::string_view signature) const;
-
-        void add_constant(const std::string& name, double value);
-        void add_prefix_operator(const std::string& signature, Unary prefix);
-        void add_binary_operator(const std::string& signature, Binary binary, Precedence precedence);
-        void add_postfix_operator(const std::string& signature, Unary postfix);
-
+        
+        template<typename Operator>
+        static size_t match(const std::string& s, size_t start, const TransparentStringKeyMap<Operator>& ops);
     private:
         TransparentStringKeyMap<double> m_constants;
         TransparentStringKeyMap<Unary> m_prefix_operators;
         TransparentStringKeyMap<BinaryOperator> m_binary_operators;
         TransparentStringKeyMap<Unary> m_postfix_operators;
-    private:
-        template<typename Operator>
-        static size_t match(const std::string& s, size_t start, const TransparentStringKeyMap<Operator>& ops);
     };
 
 
