@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <TransparentStringKeyMap.hpp>
-#include "Token.hpp"
+#include <Token.hpp>
 #include <Grammar.hpp>
 
 namespace polishd {

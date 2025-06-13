@@ -6,9 +6,9 @@
 #include <forward_list>
 #include <unordered_map>
 
-#include "Token.hpp"
-#include "Grammar.hpp"
-#include "Function.hpp"
+#include <Token.hpp>
+#include <Grammar.hpp>
+#include <Function.hpp>
 
 namespace polishd {
 
