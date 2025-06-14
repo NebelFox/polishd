@@ -1,6 +1,6 @@
 # Polishd
 
-This is a library for evaluating arithmetic expressions using [postfix notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation). The name `polishd` is a wordplay of `polish` and `polished`, implying the used notation.
+This is a library for evaluating arithmetic expressions using [postfix notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation). The name `polishd` is a wordplay of *polish* and *polished*, implying the used notation.
 
 The [demo](dmeo/) folder contains a simple command-line project showcasing the library. Check it out for a complete usage example in the code.
 
@@ -62,30 +62,28 @@ polishd::Grammar grammar;
 
 grammar.addConstant("g", 9.8);
 
-grammar.addPrefixOperator("-", [](double x) { return x; });
-grammar.addPrefixOperator("sin", std::sin);
+grammar.add_prefix_operator("-", [](double x) { return x; });
+grammar.add_prefix_operator("sin", std::sin);
 
-grammar.addBinaryOperator("+", [](double a, double b) { return a + b; }, 1);
+grammar.add_binary_operator("+", [](double a, double b) { return a + b; }, 1);
 
-grammar.addPostfixOperator("?", [](double x) { return x != 0; });
+grammar.add_postfix_operator("?", [](double x) { return x != 0; });
 ```
 
 ### Evaluate an expression
 
 ```c++
-polishd::Compiler compiler(grammar);
-
-double result = compiler.compile("-(sin g?)").evaluate();
+double result = polishd::compile(grammar, "-(sin g?)").evaluate();
 
 polishd::Args args; // just an alias to std::unordered_map<std::string, double>
 args["x"] = 4.2;
-result = compiler.compile("x + g").evaluate(args);
+result = polishd::compile(grammar, "x + g").evaluate(args);
 ```
 
 ### Save and reuse a compiled expression
 
 ```c++
-polishd::Function f = compiler.compile("-(x + x)");
+polishd::Function f = polishd::compile(grammar, "-(x + x)");
 double xs[4] {0.1, 5.4, -2, 453.522};
 double results[4];
 for(size_t i=0; i<4; ++i)
@@ -99,7 +97,7 @@ std::string infix = f.infix(); // 1 + 1
 std::string postfix = f.postfix(); // 1 1 +
 ```
 
-> **Note**: *The infix() returns the original string that was parsed, so `compiler.compile("1   +1").infix()` would give `"1  +1"` instead of `"1 + 1"` or `"1+1"`.*
+> **Note**: *The infix() returns the original string that was parsed, so `polishd::compile(grammar, "1   +1").infix()` would give `"1  +1"` instead of `"1 + 1"` or `"1+1"`.*
 
 ### Access (read-only) the Grammar entries
 
@@ -107,21 +105,17 @@ std::string postfix = f.postfix(); // 1 1 +
 for (const auto& c: grammar.constants())
     printf("const %s = %f\n", c.first, c.second);
 
-for (const auto& prf: grammar.prefixOperators())
+for (const auto& prf: grammar.prefix_operators())
     printf("prefix operator '%s'. `%s 42.0` = %f", prf.first, prf.second(42.0));
 
-for(const auto& b: grammar.binaryOperators())
+for(const auto& b: grammar.binary_operators())
     printf("binary operator '%s' with precedence %d. `2.5 %s 4.8` = %f", b.first, b.second.precedence, b.second.binary(2.5, 4.8));
 
-for (const auto& pfx: grammar.postfixOperators())
+for (const auto& pfx: grammar.postfix_operators())
     printf("postfix operator '%s'. `42.0%s` = %f", pfx.first, pfx.second(42.0));
 ```
 
 ## Semantics and Caveats
-
-Currently, a `Compiler` uses it's own copy of the `Grammar` instance
-used for initialization. So, modifying the `Grammar` instance
-after creating a `Compiler` based on it won't affect the behavior of the `Compiler`.
 
 Each argument is treated as a potential usage of a constant.
 During the compilation, the list of constants of the `Compiler`'s `Grammar` is checked
