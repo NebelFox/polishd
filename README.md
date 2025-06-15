@@ -60,7 +60,7 @@ build/demo/demo.exe
 ```c++
 polishd::Grammar grammar;
 
-grammar.addConstant("g", 9.8);
+grammar.add_constant("g", 9.8);
 
 grammar.add_prefix_operator("-", [](double x) { return x; });
 grammar.add_prefix_operator("sin", std::sin);
