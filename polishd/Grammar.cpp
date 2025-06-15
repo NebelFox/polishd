@@ -24,7 +24,7 @@ namespace polishd {
 
     size_t Grammar::match_number(const std::string& s, size_t start)
     {
-        bool is_signed = (s[start] == '-' || s[start] == '+');
+        const bool is_signed = (s[start] == '-' || s[start] == '+');
         size_t end = start + is_signed;
         while (end < s.size() && isdigit(s[end]))
             ++end;
@@ -59,8 +59,8 @@ namespace polishd {
 
     Grammar::Precedence Grammar::precedence_of(std::string_view signature) const
     {
-        auto lookup = m_binary_operators.find(signature);
-        return (lookup != m_binary_operators.end()) ? lookup->second.precedence : 0;
+        const auto lookup = m_binary_operators.find(signature);
+        return lookup != m_binary_operators.end() ? lookup->second.precedence : 0;
     }
 
     void Grammar::add_constant(const std::string& name, double value)

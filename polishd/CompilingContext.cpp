@@ -80,15 +80,14 @@ namespace polishd {
         std::stack<Token> stack;
         size_t size = 0;
         auto prev = infix.before_begin();
-        auto it = infix.begin();
-        for(; it != infix.end();)
+        for(auto it = infix.begin(); it != infix.end();)
         {
             switch(it->type)
             {
                 case TokenType::Prefix:
                 case TokenType::Opening:
                     // move from list to stack
-                    stack.push(std::move(*it));
+                    stack.push(*it);
                     it = infix.erase_after(prev);
                     break;
 
@@ -97,9 +96,9 @@ namespace polishd {
                     // move from stack to list all prefix tokens 
                     // and binary tokens with higher precedence than current;
                     // then move current from list to stack
-                    Token binary(std::move(*it));
-                    it = infix.erase_after(prev);
-                    Grammar::Precedence p = m_grammar.precedence_of(binary.value);
+                    Token binary(*it);
+                    infix.erase_after(prev);
+                    const Grammar::Precedence p = m_grammar.precedence_of(binary.value);
                     while(!stack.empty() && (stack.top().type == TokenType::Prefix || m_grammar.precedence_of(stack.top().value) > p))
                     {
                         prev = infix.insert_after(prev, stack.top());
@@ -108,16 +107,16 @@ namespace polishd {
                     }
                     it = prev;
                     ++it;
-                    stack.push(std::move(binary));
+                    stack.push(binary);
                     break;
                 }
 
                 case TokenType::Closing:
                 {
-                    it = infix.erase_after(prev);
+                    infix.erase_after(prev);
                     while(stack.top().type != TokenType::Opening)
                     {
-                        prev = infix.insert_after(prev, std::move(stack.top()));
+                        prev = infix.insert_after(prev, stack.top());
                         ++size;
                         stack.pop();
                     }
@@ -147,7 +146,7 @@ namespace polishd {
     Function CompilingContext::compile()
     {
         TokenList tokens = tokenize();
-        size_t size = convert_infix_to_postfix(tokens);
+        const size_t size = convert_infix_to_postfix(tokens);
         return Function(
             compile(tokens, size),
             m_arg_indices,
@@ -162,19 +161,14 @@ namespace polishd {
         {
             case TokenType::Number:
                 return compile_number(token);
-                break;
             case TokenType::Argument:
                 return compile_argument(token);
-                break;
             case TokenType::Prefix:
                 return compile_prefix(token);
-                break;
             case TokenType::Binary:
                 return compile_binary(token);
-                break;
             case TokenType::Postfix:
                 return compile_postfix(token);
-                break;
             default:
                 std::stringstream s;
                 s << "Unhandled TokenType: " << static_cast<unsigned short>(token.type);

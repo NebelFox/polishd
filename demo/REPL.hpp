@@ -11,19 +11,19 @@
 class REPL
 {
 public:
-    REPL(const polishd::Grammar& grammar);
+    explicit REPL(const polishd::Grammar& grammar);
 
     void start();
 
-    void eval();
+    void eval() const;
     void save();
-    void show();
-    void eval_saved();
-    void list_saved();
+    void show() const;
+    void eval_saved() const;
+    void list_saved() const;
     void delete_saved();
     void clear();
 
-    void show_grammar();
+    void show_grammar() const;
     static void help();
 
 private:

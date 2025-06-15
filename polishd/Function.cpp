@@ -26,11 +26,11 @@ namespace polishd {
         // prepare argument values
         std::vector<double> arg_values;
         arg_values.reserve(m_arg_names.size());
-        for(size_t i=0; i<m_arg_names.size(); ++i)
+        for(auto m_arg_name : m_arg_names)
         {
-            auto lookup = args.find(m_arg_names[i]);
+            auto lookup = args.find(m_arg_name);
             if(lookup == args.end())
-                throw "Missing argument " + std::string(m_arg_names[i]);
+                throw "Missing argument " + std::string(m_arg_name);
             arg_values.push_back(lookup->second);
         }
         // evaluate
@@ -61,7 +61,6 @@ namespace polishd {
                     break;
                 default:
                     throw "Unexpected token type";
-                    break;
 
             }
         }
@@ -70,7 +69,7 @@ namespace polishd {
 
     double Function::evaluate() const
     {
-        Args args;
+        const Args args;
         return evaluate(args);
     }
 
