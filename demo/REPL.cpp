@@ -136,7 +136,7 @@ void REPL::show_grammar()
 
 void REPL::help()
 {
-    static const std::string message(
+    std::cout << (
         "This is a demo of `polishd` library.\n"
         "It uses postfix notation to evaluate arithmetic expressions.\n"
         "\n"
@@ -159,16 +159,17 @@ void REPL::help()
         "\tSo they could be used with parenthesis like `1 + cos 0`;\n"
         "\tAn argument wrapped in parentheses is treated as a regular subexpression, e.g. sin(pi*0.5).\n"
         "\tAn expression is evaluated from left to right, so `cos 0+1` is equivalent to `(cos 0) + 1`.\n"
+        "\n"
         "Arguments (ARGS...):\n"
         "\tA sequence of `name=value` pairs, separated by at least one space.\n"
         "\tThe `name` must consist only of english letters and underscore (`_`).\n"
         "\tThe `value` could be either an integer, e.g. `42` or `-1`, or a float, e.g. `4.2` or `-0.3`.\n"
         "\tThe arguments could be specified in any order.\n"
         "\tArguments that are not used in the expression are ignored and won't cause an error.\n"
+        "\n"
         "Function names (NAME):\n"
         "\tAny non-zero-length sequence of non-whitespace characters.\n"
     );
-    std::cout << message;
 }
 
 std::pair<size_t, polishd::Args> REPL::parse_args(const std::string& s)
