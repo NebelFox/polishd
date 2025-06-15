@@ -11,7 +11,7 @@
 class REPL
 {
 public:
-    REPL(polishd::Grammar& grammar);
+    REPL(const polishd::Grammar& grammar);
 
     void start();
 
