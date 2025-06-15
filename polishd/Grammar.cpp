@@ -25,21 +25,21 @@ namespace polishd {
     size_t Grammar::match_number(const std::string& s, size_t start)
     {
         bool is_signed = (s[start] == '-' || s[start] == '+');
-        size_t length = is_signed;
-        while (length < s.size() && isdigit(s[start + length]))
-            ++length;
-        length += length < s.size() && s[start + length] == '.';
-        while (length < s.size() && isdigit(s[start + length]))
-            ++length;
-        return length * (!is_signed || length > 1);
+        size_t end = start + is_signed;
+        while (end < s.size() && isdigit(s[end]))
+            ++end;
+        end += end < s.size() && s[end] == '.';
+        while (end < s.size() && isdigit(s[end]))
+            ++end;
+        return (end - start) * (!is_signed || (end - start) > 1);
     }
 
     size_t Grammar::match_argument(const std::string& s, size_t start)
     {
-        size_t length = 0;
-        while (length < s.size() && (isalpha(s[start + length]) || s[start + length] == '_'))
-            ++length;
-        return length;
+        size_t end = 0;
+        while (end < s.size() && (isalpha(s[end]) || s[end] == '_'))
+            ++end;
+        return end - start;
     }
 
     size_t Grammar::match_prefix(const std::string& s, size_t start) const
