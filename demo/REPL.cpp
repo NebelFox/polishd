@@ -3,19 +3,19 @@
 #include <iostream>
 #include <functional>
 
-const std::regex REPL::s_argsPattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)");
+const std::regex REPL::s_args_pattern("(?:([a-zA-Z_]+)=([\\-0-9.]+)*)");
 
 REPL::REPL(polishd::Grammar& grammar) : m_grammar(grammar)
 {
     #define BIND(METHOD) std::bind(&REPL::METHOD, this);
     m_commands["save"] = BIND(save);
     m_commands["eval"] = BIND(eval);
-    m_commands["evals"] = BIND(evalSaved);
+    m_commands["evals"] = BIND(eval_saved);
     m_commands["show"] = BIND(show);
-    m_commands["list"] = BIND(listSaved);
-    m_commands["delete"] = BIND(deleteSaved);
+    m_commands["list"] = BIND(list_saved);
+    m_commands["delete"] = BIND(delete_saved);
     m_commands["clear"] = BIND(clear);
-    m_commands["grammar"] = BIND(showGrammar);
+    m_commands["grammar"] = BIND(show_grammar);
     m_commands["help"] = help;
     #undef BIND
 }
@@ -61,13 +61,13 @@ void REPL::eval()
 {
     std::string tail;
     std::getline(std::cin >> std::ws, tail);
-    auto [start, args] = parseArgs(tail);
+    auto [start, args] = parse_args(tail);
     polishd::Function f = polishd::compile(m_grammar, tail.substr(0, start));
     double result = f(args);
     std::cout << result << std::endl;
 }
 
-void REPL::evalSaved()
+void REPL::eval_saved()
 {
     std::string name;
     std::cin >> name >> std::ws;
@@ -79,7 +79,7 @@ void REPL::evalSaved()
         std::cout << "No function with name '" << name << '\'' << std::endl;
         return;
     }
-    polishd::Args args = parseArgs(tail).second;
+    polishd::Args args = parse_args(tail).second;
     double result = lookup->second(args);
     std::cout << result << std::endl;
 }
@@ -96,7 +96,7 @@ void REPL::show()
     }
 }
 
-void REPL::listSaved()
+void REPL::list_saved()
 {
     if(!m_functions.empty())
     {
@@ -105,7 +105,7 @@ void REPL::listSaved()
     }
 }
 
-void REPL::deleteSaved()
+void REPL::delete_saved()
 {
     std::string name;
     std::cin >> name;
@@ -117,7 +117,7 @@ void REPL::clear()
     m_functions.clear();
 }
 
-void REPL::showGrammar()
+void REPL::show_grammar()
 {
     std::cout << "Constants: ";
     for (const auto& pair: m_grammar.constants())
@@ -171,10 +171,10 @@ void REPL::help()
     std::cout << message;
 }
 
-std::pair<size_t, polishd::Args> REPL::parseArgs(const std::string& s)
+std::pair<size_t, polishd::Args> REPL::parse_args(const std::string& s)
 {
     polishd::Args args;
-    auto iterator = std::sregex_iterator(s.begin(), s.end(), s_argsPattern);
+    auto iterator = std::sregex_iterator(s.begin(), s.end(), s_args_pattern);
     auto end = std::sregex_iterator();
     size_t start = std::string::npos;
     if(iterator != end)
