@@ -102,17 +102,18 @@ std::string postfix = f.postfix(); // 1 1 +
 ### Access (read-only) the Grammar entries
 
 ```c++
-for (const auto& c: grammar.constants())
-    printf("const %s = %f\n", c.first, c.second);
+const double a = 4.2, b = 2.5;
+for (const auto& [name, value]: grammar.constants())
+    printf("const `%s` = %f\n", name.c_str(), value);
 
-for (const auto& prf: grammar.prefix_operators())
-    printf("prefix operator '%s'. `%s 42.0` = %f", prf.first, prf.second(42.0));
+for (const auto& [name, op]: grammar.prefix())
+    printf("prefix operator `%s`. `%s %f` = %f\n", name.c_str(), name.c_str(), a, op(a));
 
-for(const auto& b: grammar.binary_operators())
-    printf("binary operator '%s' with precedence %d. `2.5 %s 4.8` = %f", b.first, b.second.precedence, b.second.binary(2.5, 4.8));
+for(const auto& [name, op]: grammar.binary())
+    printf("binary operator `%s` with precedence %d. `%f %s %f` = %f\n", name.c_str(), op.precedence, a, name.c_str(), b, op.binary(a, b));
 
-for (const auto& pfx: grammar.postfix_operators())
-    printf("postfix operator '%s'. `42.0%s` = %f", pfx.first, pfx.second(42.0));
+for (const auto& [name, op]: grammar.postfix())
+    printf("postfix operator `%s`. `%f%s` = %f\n", name.c_str(), a, name.c_str(), op(a));
 ```
 
 ## Semantics and Caveats

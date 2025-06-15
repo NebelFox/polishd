@@ -119,19 +119,18 @@ void REPL::clear()
 
 void REPL::show_grammar()
 {
-    std::cout << "Constants: ";
-    for (const auto& pair: m_grammar.constants())
-        std::cout << pair.first << '=' << pair.second << ", ";
-    std::cout << std::endl << "Prefix Functions: ";
-    for (const auto& pair: m_grammar.prefix())
-        std::cout << pair.first << ", ";
-    std::cout << std::endl << "Binary Operations (precedence): ";
-    for (const auto& pair: m_grammar.binary())
-        std::cout << pair.first << '(' << (short) pair.second.precedence << "), ";
-    std::cout << std::endl << "Postfix Functions: ";
-    for (const auto& pair: m_grammar.postfix())
-        std::cout << pair.first << ", ";
-    std::cout << std::endl;
+    const double a = 4.2, b = 2.5;
+    for (const auto& [name, value]: m_grammar.constants())
+        printf("const `%s` = %f\n", name.c_str(), value);
+
+    for (const auto& [name, op]: m_grammar.prefix())
+        printf("prefix operator `%s`. `%s %f` = %f\n", name.c_str(), name.c_str(), a, op(a));
+
+    for(const auto& [name, op]: m_grammar.binary())
+        printf("binary operator `%s` with precedence %d. `%f %s %f` = %f\n", name.c_str(), op.precedence, a, name.c_str(), b, op.binary(a, b));
+
+    for (const auto& [name, op]: m_grammar.postfix())
+        printf("postfix operator `%s`. `%f%s` = %f\n", name.c_str(), a, name.c_str(), op(a));
 }
 
 void REPL::help()
