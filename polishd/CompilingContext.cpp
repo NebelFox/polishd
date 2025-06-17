@@ -13,6 +13,48 @@ namespace polishd {
     {
     }
 
+    Function CompilingContext::compile()
+    {
+        TokenList tokens = tokenize();
+        const size_t size = convert_infix_to_postfix(tokens);
+        return Function(
+            compile(tokens, size),
+            m_arg_indices,
+            m_infix,
+            stringify(tokens)
+        );
+    }
+
+    CompilingContext::TokenList CompilingContext::tokenize() const
+    {
+        size_t start = 0;
+        TokenList tokens;
+        auto last = tokens.before_begin();
+        bool expectOperand = true;
+
+        while (m_infix[start] == ' ')
+            ++start;
+        
+        while (start < m_infix.size())
+        {
+            last = tokens.insert_after(last, 
+                expectOperand
+                ? parse_operand(start)
+                : parse_operator(start));
+            
+            start += last->value.size();
+            
+            if(last->type == TokenType::Number || last->type == TokenType::Argument)
+                expectOperand = false;
+            else if(last->type == TokenType::Binary)
+                expectOperand = true;
+
+            while (m_infix[start] == ' ')
+                ++start;
+        }
+        return tokens;
+    }
+
     Token CompilingContext::parse_operand(size_t start) const
     {
         auto type = TokenType::None;
@@ -45,36 +87,6 @@ namespace polishd {
             throw ExpressionSyntaxError("expected a binary operator, a postfix function or a closing parenthesis starting at " + m_infix.substr(start));
 
         return Token{.type = type, .value = std::string_view(m_infix).substr(start, length)};
-    }
-
-    CompilingContext::TokenList CompilingContext::tokenize() const
-    {
-        size_t start = 0;
-        TokenList tokens;
-        auto last = tokens.before_begin();
-        bool expectOperand = true;
-
-        while (m_infix[start] == ' ')
-            ++start;
-        
-        while (start < m_infix.size())
-        {
-            last = tokens.insert_after(last, 
-                expectOperand
-                ? parse_operand(start)
-                : parse_operator(start));
-            
-            start += last->value.size();
-            
-            if(last->type == TokenType::Number || last->type == TokenType::Argument)
-                expectOperand = false;
-            else if(last->type == TokenType::Binary)
-                expectOperand = true;
-
-            while (m_infix[start] == ' ')
-                ++start;
-        }
-        return tokens;
     }
 
     size_t CompilingContext::convert_infix_to_postfix(TokenList& infix) const
@@ -145,16 +157,13 @@ namespace polishd {
         return size;
     }
 
-    Function CompilingContext::compile()
+    Function::Expression CompilingContext::compile(const TokenList& postfix, size_t size)
     {
-        TokenList tokens = tokenize();
-        const size_t size = convert_infix_to_postfix(tokens);
-        return Function(
-            compile(tokens, size),
-            m_arg_indices,
-            m_infix,
-            stringify(tokens)
-        );
+        Function::Expression expression;
+        expression.reserve(size);
+        for (const Token& token: postfix)
+            expression.push_back(compile(token));
+        return expression;
     }
 
     Function::Unit CompilingContext::compile(const Token& token)
@@ -176,15 +185,6 @@ namespace polishd {
         }
     }
 
-    Function::Expression CompilingContext::compile(const TokenList& postfix, size_t size)
-    {
-        Function::Expression expression;
-        expression.reserve(size);
-        for (const Token& token: postfix)
-            expression.push_back(compile(token));
-        return expression;
-    }
-
     Function::Unit CompilingContext::compile_number(const Token& token)
     {
         double x;
@@ -198,28 +198,30 @@ namespace polishd {
         {
             return {.type = TokenType::Number, .number = const_lookup->second};
         }
+
         if (const auto arg_lookup = m_arg_indices.find(token.value); arg_lookup != m_arg_indices.end())
         {
             return {.type = token.type, .arg_index = arg_lookup->second};
         }
+
         m_arg_indices[token.value] = m_arg_indices.size();
         return {.type = token.type, .arg_index = m_arg_indices.size()-1};
     }
-
-    Function::Unit CompilingContext::compile_unary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry)
-    {
-        const Grammar::Unary unary = registry.find(token.value)->second;
-        return {.type = token.type, .unary = unary};
-    }
-
+    
     Function::Unit CompilingContext::compile_prefix(const Token& token) const
     {
         return compile_unary(token, m_grammar.prefix());
     }
-
+    
     Function::Unit CompilingContext::compile_postfix(const Token& token) const
     {
         return compile_unary(token, m_grammar.postfix());
+    }
+    
+    Function::Unit CompilingContext::compile_unary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& ops)
+    {
+        const Grammar::Unary unary = ops.find(token.value)->second;
+        return {.type = token.type, .unary = unary};
     }
 
     Function::Unit CompilingContext::compile_binary(const Token& token) const

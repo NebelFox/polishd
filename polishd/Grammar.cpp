@@ -22,6 +22,26 @@ namespace polishd {
         return m_postfix_operators;
     }
 
+    void Grammar::add_constant(const std::string& name, double value)
+    {
+        m_constants.insert_or_assign(name, value);
+    }
+
+    void Grammar::add_prefix_operator(const std::string& signature, Unary prefix)
+    {
+        m_prefix_operators.insert_or_assign(signature, prefix);
+    }
+
+    void Grammar::add_binary_operator(const std::string& signature, Binary binary, Precedence precedence)
+    {
+        m_binary_operators.insert_or_assign(signature, BinaryOperator {binary, precedence});
+    }
+
+    void Grammar::add_postfix_operator(const std::string& signature, Unary postfix)
+    {
+        m_postfix_operators.insert_or_assign(signature, postfix);
+    }
+
     size_t Grammar::match_number(const std::string& s, size_t start)
     {
         const bool is_signed = (s[start] == '-' || s[start] == '+');
@@ -57,30 +77,21 @@ namespace polishd {
         return match(s, start, m_postfix_operators);
     }
 
+    template<typename Operator>
+    size_t Grammar::match(const std::string& s, size_t start, const TransparentStringKeyMap<Operator>& ops)
+    {
+        for (const auto& pair: ops)
+        {
+            if (s.compare(start, pair.first.length(), pair.first) == 0)
+                return pair.first.length();
+        }
+        return 0;
+    }
+
     Grammar::Precedence Grammar::precedence_of(std::string_view signature) const
     {
         const auto lookup = m_binary_operators.find(signature);
         return lookup != m_binary_operators.end() ? lookup->second.precedence : 0;
-    }
-
-    void Grammar::add_constant(const std::string& name, double value)
-    {
-        m_constants.insert_or_assign(name, value);
-    }
-
-    void Grammar::add_prefix_operator(const std::string& signature, Unary prefix)
-    {
-        m_prefix_operators.insert_or_assign(signature, prefix);
-    }
-
-    void Grammar::add_binary_operator(const std::string& signature, Binary binary, Precedence precedence)
-    {
-        m_binary_operators.insert_or_assign(signature, BinaryOperator {binary, precedence});
-    }
-
-    void Grammar::add_postfix_operator(const std::string& signature, Unary postfix)
-    {
-        m_postfix_operators.insert_or_assign(signature, postfix);
     }
 
 } // namespace polishd

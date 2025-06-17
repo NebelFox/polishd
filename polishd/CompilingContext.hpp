@@ -22,9 +22,9 @@ namespace polishd {
     private:
         using TokenList = std::forward_list<Token>;
 
+        TokenList tokenize() const;
         Token parse_operand(size_t start) const;
         Token parse_operator(size_t start) const;
-        TokenList tokenize() const;
 
         size_t convert_infix_to_postfix(TokenList& infix) const;
         
@@ -32,10 +32,10 @@ namespace polishd {
         Function::Unit compile(const Token& token);
 
         static Function::Unit compile_number(const Token& token);
-        static Function::Unit compile_unary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& registry);
         Function::Unit compile_argument(const Token& token);
         Function::Unit compile_prefix(const Token& token) const;
         Function::Unit compile_postfix(const Token& token) const;
+        static Function::Unit compile_unary(const Token& token, const TransparentStringKeyMap<Grammar::Unary>& ops);
         Function::Unit compile_binary(const Token& token) const;
 
         static std::string stringify(const TokenList& tokens);

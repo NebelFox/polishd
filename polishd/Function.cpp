@@ -6,23 +6,6 @@
 
 namespace polishd {
 
-    Function::Function(Expression expression,
-                       const std::unordered_map<std::string_view, size_t>& arg_indices,
-                       const std::string& infix,
-                       std::string postfix)
-        : m_expression(std::move(expression)),
-          m_arg_names(arg_indices.size()),
-          m_infix(infix),
-          m_postfix(std::move(postfix))
-    {
-        for(const auto& [arg_name, index] : arg_indices)
-        {
-            // translate arg name string_views to point to m_infix
-            const size_t start = arg_name.data() - infix.data();
-            m_arg_names[index] = std::string_view(m_infix).substr(start, arg_name.size());
-        }
-    }
-
     double Function::evaluate(const Args& args) const
     {
         // prepare argument values
@@ -93,6 +76,23 @@ namespace polishd {
     const std::string& Function::postfix() const
     {
         return m_postfix;
+    }
+
+    Function::Function(Expression expression,
+                       const std::unordered_map<std::string_view, size_t>& arg_indices,
+                       const std::string& infix,
+                       std::string postfix)
+        : m_expression(std::move(expression)),
+          m_arg_names(arg_indices.size()),
+          m_infix(infix),
+          m_postfix(std::move(postfix))
+    {
+        for(const auto& [arg_name, index] : arg_indices)
+        {
+            // translate arg name string_views to point to m_infix
+            const size_t start = arg_name.data() - infix.data();
+            m_arg_names[index] = std::string_view(m_infix).substr(start, arg_name.size());
+        }
     }
 
 } // namespace polishd

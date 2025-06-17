@@ -42,29 +42,17 @@ namespace polishd {
         size_t match_prefix(const std::string& s, size_t start) const;
         size_t match_binary(const std::string& s, size_t start) const;
         size_t match_postfix(const std::string& s, size_t start) const;
+        template<typename Operator>
+        static size_t match(const std::string& s, size_t start, const TransparentStringKeyMap<Operator>& ops);
 
         Precedence precedence_of(std::string_view signature) const;
         
-        template<typename Operator>
-        static size_t match(const std::string& s, size_t start, const TransparentStringKeyMap<Operator>& ops);
     private:
         TransparentStringKeyMap<double> m_constants;
         TransparentStringKeyMap<Unary> m_prefix_operators;
         TransparentStringKeyMap<BinaryOperator> m_binary_operators;
         TransparentStringKeyMap<Unary> m_postfix_operators;
     };
-
-
-    template<typename Operator>
-    size_t Grammar::match(const std::string& s, size_t start, const TransparentStringKeyMap<Operator>& ops)
-    {
-        for (const auto& pair: ops)
-        {
-            if (s.compare(start, pair.first.length(), pair.first) == 0)
-                return pair.first.length();
-        }
-        return 0;
-    }
 
 } // namespace polishd
 
