@@ -5,6 +5,8 @@
 #include <sstream>
 #include <charconv>
 
+#include <exceptions.hpp>
+
 namespace polishd {
 
     CompilingContext::CompilingContext(const Grammar& grammar, const std::string& infix) : m_grammar(grammar), m_infix(infix) 
@@ -24,7 +26,7 @@ namespace polishd {
         else if((length = Grammar::match_argument(m_infix, start)))
             type = TokenType::Argument;
         else
-            throw std::logic_error("Expected a number, an argument, a prefix function or an opening parenthesis starting at " + m_infix.substr(start));
+            throw ExpressionSyntaxError("expected a number, an argument, a prefix function or an opening parenthesis starting at " + m_infix.substr(start));
         
         return Token{.type = type, .value = std::string_view(m_infix).substr(start, length)};
     }
@@ -40,7 +42,7 @@ namespace polishd {
         else if ((length = (m_infix[start] == ')')))
             type = TokenType::Closing;
         else
-            throw std::logic_error("Expected a binary operator, a postfix function or a closing parenthesis starting at " + m_infix.substr(start));
+            throw ExpressionSyntaxError("expected a binary operator, a postfix function or a closing parenthesis starting at " + m_infix.substr(start));
 
         return Token{.type = type, .value = std::string_view(m_infix).substr(start, length)};
     }
@@ -170,9 +172,7 @@ namespace polishd {
             case TokenType::Postfix:
                 return compile_postfix(token);
             default:
-                std::stringstream s;
-                s << "Unhandled TokenType: " << static_cast<unsigned short>(token.type);
-                throw std::logic_error(s.str());
+                throw UnexpectedTokenError(token);
         }
     }
 

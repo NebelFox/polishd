@@ -38,12 +38,12 @@ void REPL::start()
                 running = false;
             else
                 std::cout << "Unknown command" << std::endl;
-            std::cout << std::endl;
         }
         catch(const std::exception& e)
         {
             std::cout << "Error: " << e.what() << std::endl;
         }
+        std::cout << std::endl;
     }
 }
 

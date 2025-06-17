@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <exceptions.hpp>
+
 namespace polishd {
 
     Function::Function(Expression expression,
@@ -30,7 +32,7 @@ namespace polishd {
         {
             auto lookup = args.find(m_arg_name);
             if(lookup == args.end())
-                throw "Missing argument " + std::string(m_arg_name);
+                throw MissingArgumentError(std::string(m_arg_name));
             arg_values.push_back(lookup->second);
         }
         // evaluate
@@ -60,7 +62,7 @@ namespace polishd {
                     stack.push(arg_values[unit.arg_index]);
                     break;
                 default:
-                    throw "Unexpected token type";
+                    throw UnexpectedUnitError(unit.type);
 
             }
         }
