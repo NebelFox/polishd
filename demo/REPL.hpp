@@ -18,6 +18,7 @@ public:
     void eval() const;
     void save();
     void show() const;
+    void show_saved() const;
     void eval_saved() const;
     void list_saved() const;
     void delete_saved();
@@ -27,7 +28,8 @@ public:
     static void help();
 
 private:
-    static std::pair<size_t, polishd::Args> parse_args(const std::string& s); 
+    static std::pair<size_t, polishd::Args> parse_args(const std::string& s);
+    static void show_function(const polishd::Function& f);
 private:
     const polishd::Grammar& m_grammar;
     std::unordered_map<std::string, polishd::Function> m_functions;

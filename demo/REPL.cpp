@@ -12,6 +12,7 @@ REPL::REPL(const polishd::Grammar& grammar) : m_grammar(grammar)
     m_commands["eval"] = BIND(eval);
     m_commands["evals"] = BIND(eval_saved);
     m_commands["show"] = BIND(show);
+    m_commands["shows"] = BIND(show_saved);
     m_commands["list"] = BIND(list_saved);
     m_commands["delete"] = BIND(delete_saved);
     m_commands["clear"] = BIND(clear);
@@ -85,13 +86,17 @@ void REPL::eval_saved() const
 
 void REPL::show() const
 {
+    std::string expression;
+    std::getline(std::cin, expression);
+    show_function(polishd::compile(m_grammar, expression));
+}
+
+void REPL::show_saved() const
+{
     std::string name;
     std::cin >> name;
     if (const auto lookup = m_functions.find(name); lookup != m_functions.end())
-    {
-        std::cout << "Infix form: " << lookup->second.infix() << std::endl
-                  << "Postfix form: " << lookup->second.postfix() << std::endl;
-    }
+        show_function(lookup->second);
 }
 
 void REPL::list_saved() const
@@ -138,7 +143,8 @@ void REPL::help()
             "\teval EXPR ARGS...   evaluate the expression with given arguments.\n"
             "\tsave NAME EXPR      save the expression as function NAME.\n"
             "\tevals NAME ARGS...  evaluate the saved function NAME with given arguments.\n"
-            "\tshow NAME           show saved function NAME in infix and postfix notation.\n"
+            "\tshow EXPR           show expression in infix and postfix notation.\n"
+            "\tshows NAME          show saved function NAME in infix and postfix notation.\n"
             "\tlist                show all saved functions.\n"
             "\tdelete NAME         delete the saved function NAME.\n"
             "\tclear               delete all saved functions.\n"
@@ -176,4 +182,10 @@ std::pair<size_t, polishd::Args> REPL::parse_args(const std::string& s)
     for(; iterator != end; ++iterator)
         args.insert_or_assign((*iterator)[1].str(), std::stod((*iterator)[2].str()));
     return std::make_pair(start, args);
+}
+
+void REPL::show_function(const polishd::Function& f)
+{
+    std::cout << "Infix form: " << f.infix() << std::endl
+              << "Postfix form: " << f.postfix() << std::endl;
 }

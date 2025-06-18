@@ -14,6 +14,7 @@ namespace polishd
 
     namespace
     {
+        
         std::string_view token_type_to_string(TokenType type)
         {
             switch(type) {
