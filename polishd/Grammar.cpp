@@ -56,7 +56,7 @@ namespace polishd {
 
     size_t Grammar::match_argument(const std::string& s, size_t start)
     {
-        size_t end = 0;
+        size_t end = start;
         while (end < s.size() && (isalpha(s[end]) || s[end] == '_'))
             ++end;
         return end - start;
