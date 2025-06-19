@@ -32,7 +32,7 @@ namespace polishd {
         auto last = tokens.before_begin();
         bool expectOperand = true;
 
-        while (m_infix[start] == ' ')
+        while (start < m_infix.size() && m_infix[start] == ' ')
             ++start;
         
         while (start < m_infix.size())
@@ -49,7 +49,7 @@ namespace polishd {
             else if(last->type == TokenType::Binary)
                 expectOperand = true;
 
-            while (m_infix[start] == ' ')
+            while (start < m_infix.size() && m_infix[start] == ' ')
                 ++start;
         }
         return tokens;
